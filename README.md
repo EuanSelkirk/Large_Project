@@ -3,7 +3,7 @@
 This project is a full-stack web application using:
 
 - **Frontend**: React + TypeScript + Vite + Tailwind CSS + React Router
-- **Backend**: Express.js + MongoDB + Mongoose + Node.js
+- **Server**: Express.js + MongoDB + Mongoose + Node.js
 - **Testing Tool**: Postman
 
 ---
@@ -22,7 +22,7 @@ This project is a full-stack web application using:
 /Large_Project
 │
 ├── /frontend      → React + Vite + Tailwind app
-└── /backend       → Express + MongoDB API
+└── /server        → Express + MongoDB API
 ```
 
 ---
@@ -38,29 +38,7 @@ cd Large_Project
 
 ---
 
-### 2. Backend Setup (`/backend`)
-
-```bash
-cd backend
-npm install
-```
-
-#### 🛠 Create `.env` file
-
-```env
-MONGO_URI=mongodb://localhost:27017/myproject
-PORT=3000
-```
-
-#### ▶️ Start Backend
-
-```bash
-npm run dev
-# or if not using nodemon:
-node index.js
-```
-
-Your backend will run at: [http://localhost:3000](http://localhost:3000)
+### 2. Backend Setup (`/server`) TODO
 
 ---
 
@@ -106,8 +84,6 @@ Download Postman here: [https://www.postman.com/downloads/](https://www.postman.
 ## 📝 Notes
 
 - Tailwind CSS is fully integrated in the frontend.
-- MongoDB must be running locally on port `27017`, or update the URI in `.env`.
-- Be sure to add `.env` to your `.gitignore`.
 
 ---
 
