@@ -10,8 +10,7 @@ router.post('/login', async (req, res) => {
     const { login, password } = req.body;
 
     let id = -1;       
-    let firstName = ''; 
-    let lastName = '';   
+    let username = ''; 
 
     try {
         const user = await User.findOne({ login: login.toLowerCase() });
@@ -24,8 +23,7 @@ router.post('/login', async (req, res) => {
 
             if (isMatch) {
                 id = user._id;
-                firstName = user.firstName;
-                lastName = user.lastName;
+                username = user.username;
             } else {
                 error = 'Invalid user name/password';
             }
@@ -33,13 +31,12 @@ router.post('/login', async (req, res) => {
     } catch (err) {
         console.error('Login error:', err);
         error = 'Server error during login process.';
-        return res.status(500).json({ id: -1, firstName: '', lastName: '', error: error });
+        return res.status(500).json({ id: -1, username = '', error: error });
     }
 
     const ret = {
         id: id,
-        firstName: firstName,
-        lastName: lastName,
+        username: username;
         error: error
     };
     res.status(200).json(ret);
