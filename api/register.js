@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.post('/register', async (req, res) => {
     let error = '';
-    const { login, password, email } = req.body;
+    const { username, password, email } = req.body;
     let id = -1;
 
     try {
@@ -24,7 +24,7 @@ router.post('/register', async (req, res) => {
         }
 
         user = new User({
-            login: login.toLowerCase(),
+            username: username.toLowerCase(),
             password: password,
             email: email.toLowerCase(),
         });
