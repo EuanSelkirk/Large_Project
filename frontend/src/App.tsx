@@ -1,45 +1,73 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
+import React, { useState } from "react";
+import ResumeEditor from "./components/ResumeEditor";
+import LivePreview from "./components/LivePreview";
 
 function App() {
-  const [count, setCount] = useState(0);
+  const [code, setCode] = useState(`ReactDOM.render(
+  <div className="font-sans p-6 text-gray-900">
+    <h1 className="text-4xl font-bold">Jane Doe</h1>
+    <p className="text-lg">Full-Stack Developer</p>
+    <section>
+      <h2 className="text-2xl mt-4 mb-2 font-semibold">Experience</h2>
+      <ul className="list-disc pl-5">
+        <li>Company A - Frontend Developer (2020–2022)</li>
+        <li>Company B - UI Engineer (2022–Present)</li>
+      </ul>
+    </section>
+  </div>,
+  document.getElementById('root')
+);
+`);
+
+  const [showEditor, setShowEditor] = useState(true);
 
   return (
-    <div className="text-center p-6 font-sans">
-      <div className="flex justify-center gap-8 mb-6">
-        <a href="https://vite.dev" target="_blank">
-          <img
-            src={viteLogo}
-            alt="Vite logo"
-            className="h-24 w-24 hover:drop-shadow-lg transition duration-300"
-          />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img
-            src={reactLogo}
-            alt="React logo"
-            className="h-24 w-24 hover:drop-shadow-lg transition duration-300"
-          />
-        </a>
-      </div>
-      <h1 className="text-4xl font-bold mb-6">Vite + React</h1>
-      <div className="bg-white/10 backdrop-blur p-6 rounded-lg border border-gray-300 shadow-md max-w-md mx-auto mb-6">
+    <div className="flex flex-col h-screen">
+      <div className="md:hidden p-2 flex justify-center gap-2 bg-gray-100 border-b">
         <button
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition duration-200"
-          onClick={() => setCount((count) => count + 1)}
+          className={`px-4 py-2 rounded ${
+            showEditor ? "bg-blue-600 text-white" : "bg-white border"
+          }`}
+          onClick={() => setShowEditor(true)}
         >
-          count is {count}
+          Editor
         </button>
-        <p className="mt-4 text-sm text-gray-600">
-          Edit{" "}
-          <code className="bg-gray-100 px-1 py-0.5 rounded">src/App.tsx</code>{" "}
-          and save to test HMR
-        </p>
+        <button
+          className={`px-4 py-2 rounded ${
+            !showEditor ? "bg-blue-600 text-white" : "bg-white border"
+          }`}
+          onClick={() => setShowEditor(false)}
+        >
+          Preview
+        </button>
       </div>
-      <p className="text-gray-500 text-sm">
-        Click on the Vite and React logos to learn more
-      </p>
+
+      <div className="flex flex-1 overflow-hidden">
+        {/* Mobile view: stacked and toggled */}
+        <div className="flex-1 md:hidden">
+          {showEditor ? (
+            <div className="h-full">
+              <ResumeEditor code={code} setCode={setCode} />
+            </div>
+          ) : (
+            <div className="h-full">
+              <LivePreview code={code} />
+            </div>
+          )}
+        </div>
+
+        {/* Desktop view: side by side */}
+        <div className="hidden md:flex flex-1">
+          <div className="w-1/2 h-full border-r">
+            <ResumeEditor code={code} setCode={setCode} />
+          </div>
+          <div className="w-1/2 h-full bg-gray-100 flex justify-center items-center">
+            <div className="aspect-[210/297] w-[80%] border shadow bg-white">
+              <LivePreview code={code} />
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
