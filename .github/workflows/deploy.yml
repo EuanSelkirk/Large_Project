@@ -23,7 +23,7 @@ jobs:
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
           cd ${{ secrets.APP_DIR }}
-          git pull origin main
+          git pull origin master
 
           cd server
           pm2 restart server || pm2 start server.js --name server
