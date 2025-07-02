@@ -22,16 +22,13 @@ jobs:
     - name: 🚀 Deploy over SSH
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
-        cd /var/deploy
-        git pull origin master
-        cd cards/frontend
-        npm install
-        npm run build
-        cp -r ./dist/* /var/www/html
-        cd /var/deploy/cards
-        cp server.js /var/cardsServer
-        cp createJWT.js /var/cardsServer
-        cp api.js /var/cardsServer
-        pm2 restart express-server
-        pm2 save
+          cd ${{ secrets.APP_DIR }}
+          git pull origin main
+
+          cd server
+          pm2 restart server || pm2 start server.js --name server
+
+          cd ../frontend
+          npm install
+          npm run build
         EOF
