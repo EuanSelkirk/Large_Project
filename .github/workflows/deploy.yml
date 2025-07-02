@@ -22,7 +22,7 @@ jobs:
     - name: 🚀 Deploy over SSH
       run: |
         ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
-          cd ${{ secrets.APP_DIR }}
+          cd /var/deploy
           git pull origin master
 
           cd server
