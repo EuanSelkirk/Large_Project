@@ -6,19 +6,24 @@ import User from '../model/users.js';
 const router = express.Router();   
 
 router.post('/login', async (req, res) => { 
-    let error = ''; 
     const { login, password } = req.body;
-
+    let error = ''; 
     let id = '';       
     let username = '';
     let token = '';
 
     try {
-        const user = await User.findOne({ login: login.toLowerCase() });
+        const user = await User.findOne({ username: login.toLowerCase() });
 
         if (!user) {
-            error = 'Invalid user name/password';
-        } else {
+            return res.status(401).json({
+                id: '',
+                username: '',
+                token: '',
+                error: 'Invalid username or password'
+            });
+        } 
+        else {
             const isMatch = await bcrypt.compare(password, user.password);
 
             if (isMatch) {
@@ -31,7 +36,12 @@ router.post('/login', async (req, res) => {
                     { expiresIn: '1h' }
                 )
             } else {
-                error = 'Invalid user name/password';
+                 return res.status(401).json({
+                    id: '',
+                    username: '',
+                    token: '',
+                    error: 'Invalid username or password'
+                });
             }
         }
     } 
