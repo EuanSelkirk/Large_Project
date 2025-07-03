@@ -9,7 +9,7 @@ router.post('/login', async (req, res) => {
     let error = ''; 
     const { login, password } = req.body;
 
-    let id = -1;       
+    let id = '';       
     let username = '';
     let token = '';
 
@@ -34,10 +34,11 @@ router.post('/login', async (req, res) => {
                 error = 'Invalid user name/password';
             }
         }
-    } catch (err) {
+    } 
+    catch (err) {
         console.error('Login error:', err);
         error = 'Server error during login process.';
-        return res.status(500).json({ id: -1, username: '', token: '', error: error });
+        return res.status(500).json({ id: '', username: '', token: '', error: error });
     }
 
     const ret = {
