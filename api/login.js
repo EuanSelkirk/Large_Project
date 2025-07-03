@@ -28,7 +28,7 @@ router.post('/login', async (req, res) => {
                 token = jwt.sign(
                     { userId: user._id, username: user.username },
                     process.env.JWT_SECRET,
-                    { expiresIn: '1h' };
+                    { expiresIn: '1h' }
                 )
             } else {
                 error = 'Invalid user name/password';
@@ -37,7 +37,7 @@ router.post('/login', async (req, res) => {
     } catch (err) {
         console.error('Login error:', err);
         error = 'Server error during login process.';
-        return res.status(500).json({ id: -1, username = '', token = '', error: error });
+        return res.status(500).json({ id: -1, username: '', token: '', error: error });
     }
 
     const ret = {
