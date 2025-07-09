@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { buildPath } from './Path';
+import { useNavigate } from 'react-router-dom';
 
 function Register()
 {
     const [message,setMessage] = useState('');
     const [first,setFirst] = React.useState('');
     const [last,setLast] = React.useState('');
+    const [email,setEmail] = React.useState('');
     const [loginName,setLoginName] = React.useState('');
     const [loginPassword,setPassword] = React.useState('');
 
@@ -13,7 +15,7 @@ function Register()
     {
         event.preventDefault();
 
-        var obj = {firstName:first,lastName:last,login:loginName,password:loginPassword};
+        var obj = {firstName:first,lastName:last,email:email,login:loginName,password:loginPassword};
         var js = JSON.stringify(obj);
         
         try
@@ -24,7 +26,8 @@ function Register()
 
             if( res.error.length > 0 )
             {
-                setMessage( "API Error:" + res.error );
+                //setMessage( "API Error: " + res.error );
+                setMessage( "Register Failed" );
             }
             else
             {
@@ -56,6 +59,13 @@ function Register()
     {
         setPassword( e.target.value );
     }
+
+    function handleSetEmail( e: any ) : void
+    {
+        setEmail( e.target.value );
+    }
+
+    const navigate = useNavigate();
     
     return(
         <div id="registerDiv">
@@ -64,13 +74,17 @@ function Register()
                 onChange={handleSetFirst} /><br />
             Last Name: <input type="text" id="last" placeholder="Last Name"
                 onChange={handleSetLast} /><br />
+            Email: <input type="text" id="email" placeholder="name@example.com"
+                onChange={handleSetEmail} /><br />
             Login: <input type="text" id="loginName" placeholder="Username"
                 onChange={handleSetLoginName} /><br />
             Password: <input type="password" id="loginPassword" placeholder="Password"
                 onChange={handleSetPassword} /><br />
             <input type="submit" id="registerButton" className="buttons" value = "Register"
                 onClick={doRegister} /><br />
-            <span id="registerResult">{message}</span>
+            <span id="registerResult">{message}</span><br /><br />
+            <input type="button" id="loginPageButton" className="buttons" value = "Login Page"
+                onClick={() => navigate('/')} />
         </div>
     );
 };

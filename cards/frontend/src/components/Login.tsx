@@ -2,32 +2,13 @@ import React, { useState } from 'react';
 import { buildPath } from './Path';
 import { storeToken } from '../tokenStorage';
 import { jwtDecode } from 'jwt-decode';
+import { useNavigate } from 'react-router-dom';
 
 function Login()
 {
     const [message,setMessage] = useState('');
     const [loginName,setLoginName] = React.useState('');
     const [loginPassword,setPassword] = React.useState('');
-
-    /*const app_name = 'cop4331group5.xyz';
-    
-    function buildPath(route:string) : string
-    {
-        if (import.meta.env.MODE != 'development')
-        {
-            return 'http://' + app_name + ':5000/' + route;
-        }
-        else
-        {
-            return 'http://localhost:5000/' + route;
-        }
-    }*/
-    
-    /*function doLogin(event:any) : void
-    {
-        event.preventDefault();
-        alert('doIt() ' + loginName + ' ' + loginPassword);
-    }*/
 
     async function doLogin(event:any) : Promise<void>
     {
@@ -86,27 +67,6 @@ function Login()
             return;
         }
     };
-
-    /*
-            if( res.id <= 0 )
-            {
-                setMessage('User/Password combination incorrect');
-            }
-            else
-            {
-                var user = {firstName:res.firstName,lastName:res.lastName,id:res.id}
-                localStorage.setItem('user_data', JSON.stringify(user));
-                setMessage('');
-                window.location.href = '/cards';
-            }
-        }
-        
-        catch(error:any)
-        {
-            alert(error.toString());
-            return;
-        }
-    };*/
     
     function handleSetLoginName( e: any ) : void
     {
@@ -117,6 +77,8 @@ function Login()
     {
         setPassword( e.target.value );
     }
+
+    const navigate = useNavigate();
     
     return(
         <div id="loginDiv">
@@ -127,7 +89,9 @@ function Login()
                 onChange={handleSetPassword} /><br />
             <input type="submit" id="loginButton" className="buttons" value = "Do It"
                 onClick={doLogin} /><br />
-            <span id="loginResult">{message}</span>
+            <span id="loginResult">{message}</span><br /><br />
+            <input type="button" id="registerPageButton" className="buttons" value = "Register Page"
+                onClick={() => navigate('/register')} />
         </div>
     );
 };
