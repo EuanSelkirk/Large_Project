@@ -149,10 +149,10 @@ exports.setApp = function ( app, client )
 
     app.post('/api/register', async (req, res, next) =>
     {
-        // incoming: firstName, lastName, login, password
-        // outgoing: id, firstName, lastName, error, jwtToken
+        // incoming: firstName, lastName, login, password, email
+        // outgoing: id, firstName, lastName, email, error, jwtToken
 
-        const { firstName, lastName, login, password } = req.body;
+        const { firstName, lastName, login, password , email } = req.body;
         const db = client.db('COP4331Cards');
 
         try
@@ -174,6 +174,7 @@ exports.setApp = function ( app, client )
                 UserID: newUserId,
                 FirstName: firstName,
                 LastName: lastName,
+                Email: email,
                 Login: login,
                 Password: password
             };
@@ -188,6 +189,7 @@ exports.setApp = function ( app, client )
                 id: newUserId,
                 firstName: firstName,
                 lastName: lastName,
+                email: email,
                 error: '',
                 jwtToken: jwt.jwtToken
             });
