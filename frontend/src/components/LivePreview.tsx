@@ -2,17 +2,20 @@ import React, { useEffect, useRef } from "react";
 
 type Props = {
   code: string;
+  css?: string;
 };
 
-const LivePreview: React.FC<Props> = ({ code }) => {
+const LivePreview: React.FC<Props> = ({ code, css = "" }) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
     const html = `
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      ${css}
+    </style>
     <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -33,14 +36,19 @@ const LivePreview: React.FC<Props> = ({ code }) => {
     if (iframeRef.current) {
       iframeRef.current.srcdoc = html;
     }
-  }, [code]);
+  }, [code, css]);
 
   return (
     <iframe
       ref={iframeRef}
-      className="w-full h-full border bg-white"
       title="Live Preview"
-      sandbox="allow-scripts allow-same-origin"
+      sandbox="allow-scripts"
+      style={{
+        width: "100%",
+        height: "100%",
+        border: "1px solid #ccc",
+        backgroundColor: "#fff",
+      }}
     />
   );
 };
