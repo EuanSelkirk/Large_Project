@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import ResumeEditor from "../components/ResumeEditor";
 import LivePreview from "../components/LivePreview";
 
+
 const EditorPage = () => {
   const [code, setCode] = useState(`function Resume() {
   return (
