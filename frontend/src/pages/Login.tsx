@@ -14,7 +14,7 @@ const Login = () => {
     setError("");
 
     try {
-      const res = await axios.post("/api/auth/login", {
+      const res = await axios.post("/api/login/login", {
         login: email.toLowerCase(),
         password,
       });
@@ -36,11 +36,15 @@ const Login = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#1e1e1e]">
       <div className="bg-[#2d2d2d] p-8 rounded shadow-lg w-full max-w-md">
-        <h2 className="text-2xl font-bold text-white mb-6 text-center">Login</h2>
+        <h2 className="text-2xl font-bold text-white mb-6 text-center">
+          Login
+        </h2>
 
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
-            <label className="block text-gray-300 mb-1">Username or Email</label>
+            <label className="block text-gray-300 mb-1">
+              Username or Email
+            </label>
             <input
               type="email"
               className="w-full px-3 py-2 rounded bg-[#1e1e1e] border border-gray-600 text-white"

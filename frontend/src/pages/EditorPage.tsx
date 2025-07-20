@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import ResumeEditor from "../components/ResumeEditor";
 import LivePreview from "../components/LivePreview";
 
 const EditorPage = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [code, setCode] = useState(`function Resume() {
   return (
     <div className="resume">
@@ -32,6 +33,10 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`);
     const loadResume = async () => {
       if (!id) return;
       const token = localStorage.getItem("token");
+      if (!token) {
+        navigate("/login");
+        return;
+      }
       try {
         const res = await axios.get(`/api/resumes/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -40,6 +45,13 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`);
           setCode(res.data.code);
         }
       } catch (err) {
+        if (
+          axios.isAxiosError(err) &&
+          err.response &&
+          err.response.status === 404
+        ) {
+          navigate("/dashboard");
+        }
         console.error(err);
       }
     };

@@ -15,7 +15,7 @@ const Register = () => {
     setError("");
 
     try {
-      const res = await axios.post("/api/auth/register", {
+      const res = await axios.post("/api/register/register", {
         username,
         email,
         password,
@@ -38,7 +38,9 @@ const Register = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#1e1e1e]">
       <div className="bg-[#2d2d2d] p-8 rounded shadow-lg w-full max-w-md">
-        <h2 className="text-2xl font-bold text-white mb-6 text-center">Register</h2>
+        <h2 className="text-2xl font-bold text-white mb-6 text-center">
+          Register
+        </h2>
 
         <form onSubmit={handleRegister} className="space-y-4">
           <div>
