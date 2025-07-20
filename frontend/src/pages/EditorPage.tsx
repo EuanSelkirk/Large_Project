@@ -1,8 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import axios from "axios";
 import ResumeEditor from "../components/ResumeEditor";
 import LivePreview from "../components/LivePreview";
 
 const EditorPage = () => {
+  const { id } = useParams();
   const [code, setCode] = useState(`function Resume() {
   return (
     <div className="resume">
@@ -24,6 +27,24 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`);
 `);
 
   const [activeTab, setActiveTab] = useState<"jsx" | "css" | "preview">("jsx");
+
+  useEffect(() => {
+    const loadResume = async () => {
+      if (!id) return;
+      const token = localStorage.getItem("token");
+      try {
+        const res = await axios.get(`/api/resumes/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.data.code) {
+          setCode(res.data.code);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    loadResume();
+  }, [id]);
 
   return (
     <div className="flex flex-col h-screen bg-[#1e1e1e] text-white font-mono">
