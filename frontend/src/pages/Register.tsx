@@ -15,11 +15,13 @@ const Register = () => {
     setError("");
 
     try {
-      const res = await axios.post("/api/register/register", {
+      const res = await axios.post("/api/auth/register", {
         username,
         email,
         password,
       });
+
+      console.log("here");
 
       if (res.data.token) {
         localStorage.setItem("token", res.data.token);

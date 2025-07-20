@@ -14,7 +14,7 @@ const Login = () => {
     setError("");
 
     try {
-      const res = await axios.post("/api/login/login", {
+      const res = await axios.post("/api/auth/login", {
         login: email.toLowerCase(),
         password,
       });

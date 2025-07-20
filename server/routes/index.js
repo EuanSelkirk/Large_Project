@@ -5,8 +5,8 @@ import resumeRoutes from "./resumeRoutes.js";
 
 const router = express.Router();
 
-router.use("/login", login);
-router.use("/register", register);
+router.use("/auth", login);
+router.use("/auth", register);
 router.use("/resumes", resumeRoutes);
 
 export default router;
