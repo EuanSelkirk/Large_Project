@@ -27,25 +27,42 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`);
 
   return (
     <div className="flex flex-col h-screen bg-[#1e1e1e] text-white font-mono">
-      {/* Tabs styled like VS Code */}
-      <div className="flex space-x-1 bg-[#2d2d2d] px-2 text-sm select-none">
-        {["jsx", "css", "preview"].map((tab) => (
-          <div
-            key={tab}
-            onClick={() => setActiveTab(tab as "jsx" | "css" | "preview")}
-            className={`px-3 py-1 border-t border-l border-r rounded-t-sm cursor-pointer ${
-              activeTab === tab
-                ? "bg-[#1e1e1e] border-[#3c3c3c] text-white"
-                : "bg-[#2d2d2d] border-transparent text-gray-400 hover:text-white"
-            }`}
-          >
-            {tab === "jsx"
-              ? "Resume.jsx"
-              : tab === "css"
-              ? "Resume.css"
-              : "Preview"}
-          </div>
-        ))}
+      {/* Tabs with Login/Register buttons */}
+      <div className="flex justify-between items-center bg-[#2d2d2d] px-2 text-sm select-none">
+        {/* Tabs */}
+        <div className="flex space-x-1">
+          {["jsx", "css", "preview"].map((tab) => (
+            <div
+              key={tab}
+              onClick={() => setActiveTab(tab as "jsx" | "css" | "preview")}
+              className={`px-3 py-1 border-t border-l border-r rounded-t-sm cursor-pointer ${
+                activeTab === tab
+                  ? "bg-[#1e1e1e] border-[#3c3c3c] text-white"
+                  : "bg-[#2d2d2d] border-transparent text-gray-400 hover:text-white"
+              }`}
+            >
+              {tab === "jsx"
+                ? "Resume.jsx"
+                : tab === "css"
+                ? "Resume.css"
+                : "Preview"}
+            </div>
+          ))}
+        </div>
+
+        {/* Login / Register */}
+        <div className="space-x-2">
+          <a href="/login">
+            <button className="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-white text-xs">
+              Login
+            </button>
+          </a>
+          <a href="/register">
+            <button className="bg-green-600 hover:bg-green-700 px-3 py-1 rounded text-white text-xs">
+              Register
+            </button>
+          </a>
+        </div>
       </div>
 
       {/* MOBILE: Toggled View */}
