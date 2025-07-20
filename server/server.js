@@ -2,7 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
-import resumeRoutes from ".login.js";
+import resumeRoutes from "../api/resumeRoutes.js";
 import registerRoute from "../api/register.js";
 import loginRoute from "../api/login.js";
 
