@@ -20,15 +20,35 @@ const LivePreview = React.forwardRef<HTMLIFrameElement, Props>(
     useEffect(() => {
       const html = `
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <style>${css}</style>
+    <style>
+      /* set page to A4, no default margin */
+      @page { size: A4 portrait; margin: 0; }
+
+      /* your “sheet” that html2pdf will snap */
+      .resume-sheet {
+        width: 210mm;
+        min-height: 297mm;
+        box-sizing: border-box;
+        padding: 20mm;        /* your desired print margins */
+        background: white;
+      }
+
+      /* user’s custom CSS */
+      ${css}
+    </style>
+
     <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   </head>
   <body>
-    <div id="root"></div>
+    <!-- wrap everything in the printable sheet -->
+    <div class="resume-sheet">
+      <div id="root"></div>
+    </div>
+
     <script type="text/babel">
       try {
         ${code}
@@ -38,7 +58,8 @@ const LivePreview = React.forwardRef<HTMLIFrameElement, Props>(
       }
     </script>
   </body>
-</html>`;
+</html>
+`;
       if (iframeRef.current) {
         iframeRef.current.srcdoc = html;
       }
@@ -48,7 +69,7 @@ const LivePreview = React.forwardRef<HTMLIFrameElement, Props>(
       <iframe
         ref={iframeRef}
         title="Live Preview"
-        sandbox="allow-scripts"
+        sandbox="allow-scripts allow-same-origin"
         style={{ width: "100%", height: "100%", border: "1px solid #ccc" }}
       />
     );

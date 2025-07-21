@@ -135,7 +135,7 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`);
           <ResumeEditor code={cssCode} setCode={setCssCode} />
         </div>
         <div className={activeTab === "preview" ? "block h-full" : "hidden"}>
-          <LivePreview code={code} css={cssCode} />
+          <LivePreview ref={previewRef} code={code} css={cssCode} />
         </div>
       </div>
 
@@ -149,7 +149,7 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`);
         </div>
         <div className="w-1/3 bg-[#1e1e1e] flex justify-center items-center">
           <div className="w-[90%] aspect-[210/297] bg-white border shadow">
-            <LivePreview code={code} css={cssCode} />
+            <LivePreview ref={previewRef} code={code} css={cssCode} />
           </div>
         </div>
       </div>
