@@ -5,14 +5,15 @@ import axios from "axios";
 import ResumeEditor from "../components/ResumeEditor";
 import LivePreview from "../components/LivePreview";
 import html2pdf from "html2pdf.js";
-import { Save, Download } from "lucide-react";
+import { Save, Download, Check } from "lucide-react";
 
 const EditorPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const previewRef = useRef<HTMLIFrameElement>(null);
 
-  const [html, setHtml] = useState(`function Resume() {
+  const [html, setHtml] = useState(
+    `function Resume() {
   return (
     <div className="resume">
       <h1>Jane Doe</h1>
@@ -21,22 +22,26 @@ const EditorPage = () => {
   );
 }
 
-ReactDOM.render(<Resume />, document.getElementById("root"));`);
-
-  const [cssCode, setCssCode] = useState(`.resume {
+ReactDOM.render(<Resume />, document.getElementById("root"));`
+  );
+  const [cssCode, setCssCode] = useState(
+    `.resume {
   font-family: 'Georgia', serif;
   padding: 2rem;
 }
 .resume h1 {
   font-size: 2rem;
-}
-`);
+}`
+  );
 
   const [activeTab, setActiveTab] = useState<"jsx" | "css" | "preview">("jsx");
+  const [saveSuccess, setSaveSuccess] = useState(false);
+  const [downloadSuccess, setDownloadSuccess] = useState(false);
 
+  // load existing resume
   useEffect(() => {
     if (!id) return;
-    const load = async () => {
+    (async () => {
       const token = localStorage.getItem("token");
       if (!token) return navigate("/login");
       try {
@@ -46,13 +51,11 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`);
         );
         setHtml(data.html);
         setCssCode(data.css);
-      } catch (err) {
-        const error = err as { response?: { status?: number } };
-        if (error.response?.status === 404) navigate("/dashboard");
+      } catch (err: any) {
+        if (err.response?.status === 404) navigate("/dashboard");
         console.error(err);
       }
-    };
-    load();
+    })();
   }, [id, navigate]);
 
   const saveResume = async () => {
@@ -65,10 +68,10 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`);
         { html, css: cssCode },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      alert("Resume saved!");
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 1500);
     } catch (err) {
       console.error(err);
-      alert("Failed to save. See console for details.");
     }
   };
 
@@ -78,7 +81,13 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`);
       previewRef.current.contentDocument ||
       previewRef.current.contentWindow?.document;
     if (!doc) return;
-    await html2pdf().from(doc.body).save("resume.pdf");
+    try {
+      await html2pdf().from(doc.body).save("resume.pdf");
+      setDownloadSuccess(true);
+      setTimeout(() => setDownloadSuccess(false), 1500);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
@@ -107,16 +116,24 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`);
           <button
             onClick={saveResume}
             aria-label="Save"
-            className="p-2 bg-blue-600 hover:bg-blue-700 rounded"
+            className="group p-2 rounded hover:bg-[#3c3c3c]"
           >
-            <Save className="h-5 w-5 text-white" />
+            {saveSuccess ? (
+              <Check className="h-5 w-5 text-green-400" />
+            ) : (
+              <Save className="h-5 w-5 text-gray-400 group-hover:text-white" />
+            )}
           </button>
           <button
             onClick={downloadPdf}
             aria-label="Download"
-            className="p-2 bg-green-600 hover:bg-green-700 rounded"
+            className="group p-2 rounded hover:bg-[#3c3c3c]"
           >
-            <Download className="h-5 w-5 text-white" />
+            {downloadSuccess ? (
+              <Check className="h-5 w-5 text-green-400" />
+            ) : (
+              <Download className="h-5 w-5 text-gray-400 group-hover:text-white" />
+            )}
           </button>
         </div>
       </div>

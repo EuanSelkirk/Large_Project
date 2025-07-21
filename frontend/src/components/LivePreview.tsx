@@ -30,7 +30,12 @@ const LivePreview = React.forwardRef<HTMLIFrameElement, Props>(
 
       updateScale();
       window.addEventListener("resize", updateScale);
-      return () => window.removeEventListener("resize", updateScale);
+      const ro = new ResizeObserver(updateScale);
+      if (wrapperRef.current) ro.observe(wrapperRef.current);
+      return () => {
+        window.removeEventListener("resize", updateScale);
+        ro.disconnect();
+      };
     }, []);
 
     // rebuild the iframe contents when html/css change
