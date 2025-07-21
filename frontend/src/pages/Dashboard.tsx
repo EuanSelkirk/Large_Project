@@ -1,18 +1,12 @@
 import { useEffect, useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 interface Resume {
   _id: string;
+  name: string;
   code: string;
   createdAt: string;
-}
-
-interface JwtPayload {
-  userId: string;
-  username: string;
-  iat: number;
-  exp: number;
 }
 
 const Dashboard = () => {
@@ -27,6 +21,7 @@ const Dashboard = () => {
         navigate("/login");
         return;
       }
+
       try {
         const res = await axios.get<Resume[]>("/api/resumes", {
           headers: { Authorization: `Bearer ${token}` },
@@ -73,6 +68,9 @@ const Dashboard = () => {
       navigate("/login");
       return;
     }
+    const name =
+      window.prompt("Enter a name for this resume", "Untitled Resume") ||
+      "Untitled Resume";
     const defaultCode = `function Resume() {
   return (
     <div className="resume">
@@ -86,7 +84,7 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`;
     try {
       const { data } = await axios.post<Resume>(
         "/api/resumes",
-        { code: defaultCode },
+        { name, code: defaultCode },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setResumes((prev) => [data, ...prev]);
@@ -96,13 +94,11 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`;
     }
   };
 
-  const deleteResume = async (id: string) => {
+  const deleteResume = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation(); // ← prevent the card’s onClick
     if (!window.confirm("Delete this resume?")) return;
     const token = localStorage.getItem("token");
-    if (!token) {
-      navigate("/login");
-      return;
-    }
+    if (!token) return navigate("/login");
     try {
       await axios.delete(`/api/resumes/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -135,35 +131,25 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`;
             {resumes.map((resume) => (
               <div
                 key={resume._id}
-                className="relative bg-[#2d2d2d] p-4 rounded shadow hover:bg-[#3a3a3a] transition"
+                onClick={() => navigate(`/editor/${resume._id}`)}
+                className="cursor-pointer bg-[#2d2d2d] p-4 rounded shadow hover:bg-[#3a3a3a] transition"
               >
-                {/* Whole card is a link */}
-                <Link
-                  to={`/editor/${resume._id}`}
-                  className="absolute inset-0 z-10"
-                />
-
-                {/* Content */}
-                <div className="relative z-20">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="font-semibold">
-                      Resume #{resume._id.slice(-6)}
-                    </span>
-                    <span className="text-xs text-gray-400">
-                      {new Date(resume.createdAt).toLocaleDateString()}
-                    </span>
-                  </div>
-                  <pre className="text-xs h-24 overflow-hidden text-gray-300">
-                    {resume.code.slice(0, 100)}...
-                  </pre>
-                  <div className="mt-2 flex space-x-2">
-                    <button
-                      onClick={() => deleteResume(resume._id)}
-                      className="bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-sm z-20"
-                    >
-                      Delete
-                    </button>
-                  </div>
+                <div className="flex justify-between items-center mb-2">
+                  <span className="font-semibold">{resume.name}</span>
+                  <span className="text-xs text-gray-400">
+                    {new Date(resume.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
+                <pre className="text-xs h-24 overflow-hidden text-gray-300">
+                  {resume.code.slice(0, 100)}...
+                </pre>
+                <div className="mt-2">
+                  <button
+                    onClick={(e) => deleteResume(e, resume._id)}
+                    className="bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-sm"
+                  >
+                    Delete
+                  </button>
                 </div>
               </div>
             ))}

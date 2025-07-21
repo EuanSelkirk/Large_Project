@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -5,8 +6,9 @@ import ResumeEditor from "../components/ResumeEditor";
 import LivePreview from "../components/LivePreview";
 
 const EditorPage = () => {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+
   const [code, setCode] = useState(`function Resume() {
   return (
     <div className="resume">
@@ -29,46 +31,55 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`);
 
   const [activeTab, setActiveTab] = useState<"jsx" | "css" | "preview">("jsx");
 
+  // load existing resume
   useEffect(() => {
-    const loadResume = async () => {
-      if (!id) return;
+    if (!id) return;
+    const load = async () => {
       const token = localStorage.getItem("token");
-      if (!token) {
-        navigate("/login");
-        return;
-      }
+      if (!token) return navigate("/login");
       try {
-        const res = await axios.get<{ code: string }>(`/api/resumes/${id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (res.data.code) {
-          setCode(res.data.code);
-        }
-      } catch (err: unknown) {
-        if (
-          err &&
-          typeof err === "object" &&
-          "response" in err &&
-          (err as { response?: { status?: number } }).response?.status === 404
-        ) {
-          navigate("/dashboard");
-        }
+        const { data } = await axios.get<{ code: string }>(
+          `/api/resumes/${id}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setCode(data.code);
+      } catch (err: any) {
+        if (err.response?.status === 404) navigate("/dashboard");
         console.error(err);
       }
     };
-    loadResume();
-  }, [id]);
+    load();
+  }, [id, navigate]);
+
+  // save handler
+  const saveResume = async () => {
+    if (!id) return;
+    const token = localStorage.getItem("token");
+    if (!token) return navigate("/login");
+    try {
+      await axios.put(
+        `/api/resumes/${id}`,
+        { code },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      // you can replace alert with a fancier toast
+      alert("Resume saved!");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to save. See console for details.");
+    }
+  };
 
   return (
     <div className="flex flex-col h-screen bg-[#1e1e1e] text-white font-mono">
-      {/* Tabs with Login/Register buttons */}
+      {/* Top bar with Tabs + Save/Dashboard */}
       <div className="flex justify-between items-center bg-[#2d2d2d] px-2 text-sm select-none">
         {/* Tabs */}
         <div className="flex space-x-1">
-          {["jsx", "css", "preview"].map((tab) => (
+          {(["jsx", "css", "preview"] as const).map((tab) => (
             <div
               key={tab}
-              onClick={() => setActiveTab(tab as "jsx" | "css" | "preview")}
+              onClick={() => setActiveTab(tab)}
               className={`px-3 py-1 border-t border-l border-r rounded-t-sm cursor-pointer ${
                 activeTab === tab
                   ? "bg-[#1e1e1e] border-[#3c3c3c] text-white"
@@ -84,22 +95,24 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`);
           ))}
         </div>
 
-        {/* Login / Register */}
+        {/* Save + Dashboard */}
         <div className="space-x-2">
-          <a href="/login">
-            <button className="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-white text-xs">
-              Login
-            </button>
-          </a>
-          <a href="/register">
-            <button className="bg-green-600 hover:bg-green-700 px-3 py-1 rounded text-white text-xs">
-              Register
-            </button>
-          </a>
+          <button
+            onClick={saveResume}
+            className="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-white text-xs"
+          >
+            Save
+          </button>
+          <button
+            onClick={() => navigate("/dashboard")}
+            className="bg-gray-600 hover:bg-gray-700 px-3 py-1 rounded text-white text-xs"
+          >
+            Dashboard
+          </button>
         </div>
       </div>
 
-      {/* MOBILE: Toggled View */}
+      {/* MOBILE: toggled view */}
       <div className="md:hidden flex-1 overflow-hidden relative">
         <div className={activeTab === "jsx" ? "block h-full" : "hidden"}>
           <ResumeEditor code={code} setCode={setCode} />
@@ -112,7 +125,7 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`);
         </div>
       </div>
 
-      {/* DESKTOP: Side-by-side */}
+      {/* DESKTOP: side-by-side */}
       <div className="hidden md:flex flex-1 border-t border-[#3c3c3c]">
         <div className="w-1/3 border-r border-[#3c3c3c]">
           <ResumeEditor code={code} setCode={setCode} />

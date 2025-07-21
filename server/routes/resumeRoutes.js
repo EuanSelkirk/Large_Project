@@ -7,9 +7,11 @@ const router = express.Router();
 // Create a new resume
 router.post("/", authenticate, async (req, res) => {
   try {
+    const { name, code } = req.body;
     const resume = new Resume({
-      ...req.body, // e.g. { code: "..."}
-      user: req.user.userId, // ← save under `user`
+      name,
+      code,
+      user: req.user.userId,
     });
     await resume.save();
     res.status(201).json(resume);
