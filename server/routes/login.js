@@ -42,14 +42,19 @@ router.post("/login", async (req, res) => {
       const isMatch = await bcrypt.compare(password, user.password);
 
       if (isMatch) {
-        id = user._id;
-        username = user.username;
+      const token = jwt.sign(
+        { userId: user._id, username: user.username },
+        process.env.JWT_SECRET,
+        { expiresIn: "1h" }
+      );
 
-        token = jwt.sign(
-          { userId: user._id, username: user.username },
-          process.env.JWT_SECRET,
-          { expiresIn: "1h" }
-        );
+      return res.status(200).json({
+        id: user._id,
+        username: user.username,
+        token: token,
+        error: "",
+      });
+
       } else {
         return res.status(401).json({
           id: "",
