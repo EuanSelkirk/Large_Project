@@ -1,39 +1,16 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
 
 // Define the shape of your User object
-interface User {
-  _id: string;
-  username: string;
-  email: string;
-  // add any other fields your API returns
-}
 
 const Login = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
-  const navigate = useNavigate();
 
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
     setError("");
-
-    try {
-      // 3) DEBUG: fetch all users with correct typing
-      const { data: users } = await axios.get<User[]>("/api/debug/users");
-      console.log("here");
-
-      // 4) Continue on
-      // navigate("/editor");
-    } catch (err: any) {
-      console.error(err);
-      setError(
-        err.response?.data?.error || "Unable to login. Check your credentials."
-      );
-    }
   };
 
   return (

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
 import ResumeEditor from "../components/ResumeEditor";
 import LivePreview from "../components/LivePreview";
 
@@ -36,23 +35,6 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`);
       if (!token) {
         navigate("/login");
         return;
-      }
-      try {
-        const res = await axios.get(`/api/resumes/${id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (res.data.code) {
-          setCode(res.data.code);
-        }
-      } catch (err) {
-        if (
-          axios.isAxiosError(err) &&
-          err.response &&
-          err.response.status === 404
-        ) {
-          navigate("/dashboard");
-        }
-        console.error(err);
       }
     };
     loadResume();
