@@ -70,8 +70,8 @@ router.post("/register", async (req, res) => {
     await user.save();
 
     // 7) Send verification email
-    const apiUrl = process.env.API_URL || "http://localhost:5174";
-    const verifyLink = `${apiUrl}/api/auth/verify/${verificationToken}`;
+    const backend = process.env.BACKEND_URL || "http://localhost:5174";
+    const verifyLink = `${backend}/api/auth/verify/${verificationToken}`;
 
     const transporter = nodemailer.createTransport({
       service: "gmail",
@@ -106,7 +106,24 @@ router.post("/register", async (req, res) => {
 });
 
 router.get("/verify/:token", async (req, res) => {
-  // … your verify handler …
+  const { token } = req.params;
+  try {
+    const user = await User.findOne({ verificationToken: token });
+    if (!user) {
+      return res
+        .status(400)
+        .json({ error: "Invalid or expired verification token" });
+    }
+
+    user.verified = true;
+    user.verificationToken = undefined;
+    await user.save();
+
+    return res.json({ message: "Email verified successfully" });
+  } catch (err) {
+    console.error("[VERIFY] Server error:", err);
+    return res.status(500).json({ error: "Server error verifying email" });
+  }
 });
 
 export default router;
