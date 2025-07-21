@@ -96,6 +96,7 @@ router.post("/register", async (req, res) => {
     // 9) Respond
     return res.status(201).json({
       id: user._id,
+      username: user.username,
       email: user.email,
       token,
     });
