@@ -1,5 +1,6 @@
 import express from "express";
 import User from "../model/users.js";
+import Resume from "../model/resume.js";
 
 const router = express.Router();
 
@@ -20,6 +21,15 @@ router.get("/users", async (req, res) => {
   } catch (err) {
     console.error("🛠️ [DEBUG] Error fetching users:", err);
     res.status(500).json({ error: "Server error fetching users." });
+  }
+});
+
+router.get("/allResumes", async (req, res) => {
+  try {
+    const all = await Resume.find({});
+    res.json(all);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 

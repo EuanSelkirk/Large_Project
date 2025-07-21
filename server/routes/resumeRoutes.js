@@ -4,33 +4,37 @@ import authenticate from "../middleware/auth.js";
 
 const router = express.Router();
 
+// Create a new resume
 router.post("/", authenticate, async (req, res) => {
   try {
     const resume = new Resume({
-      ...req.body,
-      userId: req.user.userId,
+      ...req.body, // e.g. { code: "..."}
+      user: req.user.userId, // ← save under `user`
     });
     await resume.save();
     res.status(201).json(resume);
   } catch (err) {
+    console.error("[RESUMES] save error:", err);
     res.status(400).json({ error: err.message });
   }
 });
 
+// List all resumes for the logged-in user
 router.get("/", authenticate, async (req, res) => {
   try {
-    const resumes = await Resume.find({ userId: req.user.userId });
+    const resumes = await Resume.find({ user: req.user.userId });
     res.json(resumes);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
+// Get one resume by ID (only if it belongs to this user)
 router.get("/:id", authenticate, async (req, res) => {
   try {
     const resume = await Resume.findOne({
       _id: req.params.id,
-      userId: req.user.userId,
+      user: req.user.userId, // ← filter by `user`
     });
     if (!resume) return res.status(404).json({ error: "Resume not found" });
     res.json(resume);
@@ -39,10 +43,11 @@ router.get("/:id", authenticate, async (req, res) => {
   }
 });
 
+// Update a resume
 router.put("/:id", authenticate, async (req, res) => {
   try {
     const resume = await Resume.findOneAndUpdate(
-      { _id: req.params.id, userId: req.user.userId },
+      { _id: req.params.id, user: req.user.userId },
       req.body,
       { new: true }
     );
@@ -56,11 +61,12 @@ router.put("/:id", authenticate, async (req, res) => {
   }
 });
 
+// Delete a resume
 router.delete("/:id", authenticate, async (req, res) => {
   try {
     const resume = await Resume.findOneAndDelete({
       _id: req.params.id,
-      userId: req.user.userId,
+      user: req.user.userId,
     });
     if (!resume)
       return res
