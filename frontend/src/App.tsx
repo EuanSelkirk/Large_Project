@@ -4,6 +4,8 @@ import Dashboard from "./pages/Dashboard";
 import EditorPage from "./pages/EditorPage";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Profile from "./pages/Profile";
+import Layout from "./components/Layout";
 
 function App() {
   return (
@@ -12,8 +14,11 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/editor/:id" element={<EditorPage />} />
+        <Route element={<Layout />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/editor/:id" element={<EditorPage />} />
+          <Route path="/profile" element={<Profile />} />
+        </Route>
       </Routes>
     </Router>
   );

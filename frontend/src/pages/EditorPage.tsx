@@ -103,12 +103,6 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`);
           >
             Save
           </button>
-          <button
-            onClick={() => navigate("/dashboard")}
-            className="bg-gray-600 hover:bg-gray-700 px-3 py-1 rounded text-white text-xs"
-          >
-            Dashboard
-          </button>
         </div>
       </div>
 
