@@ -3,6 +3,14 @@ import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
+// Define the shape of your User object
+interface User {
+  _id: string;
+  username: string;
+  email: string;
+  // add any other fields your API returns
+}
+
 const Login = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -13,23 +21,20 @@ const Login = () => {
     e.preventDefault();
     setError("");
 
-    try {
-      const res = await axios.post("/api/auth/login", {
-        login: email.toLowerCase(),
-        password,
-      });
+    console.log("here");
 
-      if (res.data.token) {
-        localStorage.setItem("token", res.data.token);
-        localStorage.setItem("userId", res.data.id);
-        localStorage.setItem("username", res.data.username);
-        navigate("/editor");
-      } else {
-        setError(res.data.error || "Login failed");
-      }
-    } catch (err) {
+    try {
+      // 3) DEBUG: fetch all users with correct typing
+      const { data: users } = await axios.get<User[]>("/api/users");
+      console.log("🛠️ [DEBUG] All users:", users);
+
+      // 4) Continue on
+      navigate("/editor");
+    } catch (err: any) {
       console.error(err);
-      setError("Unable to login. Check your credentials.");
+      setError(
+        err.response?.data?.error || "Unable to login. Check your credentials."
+      );
     }
   };
 

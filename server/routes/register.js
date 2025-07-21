@@ -16,6 +16,8 @@ router.post("/register", async (req, res) => {
   let id = -1;
   let token = "";
 
+  console.log("here");
+
   try {
     const login = username.toLowerCase();
 
