@@ -13,7 +13,6 @@ interface Resume {
 const Dashboard = () => {
   const [resumes, setResumes] = useState<Resume[]>([]);
   const navigate = useNavigate();
-  const [username, setUsername] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchResumes = async () => {
@@ -40,28 +39,6 @@ const Dashboard = () => {
     };
     fetchResumes();
   }, [navigate]);
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
-
-    try {
-      const base64Url = token.split(".")[1];
-      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-      const jsonPayload = decodeURIComponent(
-        atob(base64)
-          .split("")
-          .map((c) => "%" + c.charCodeAt(0).toString(16).padStart(2, "0"))
-          .join("")
-      );
-
-      console.log(jsonPayload);
-      const { username } = JSON.parse(jsonPayload) as { username: string };
-      setUsername(username);
-    } catch (e) {
-      console.error("Invalid token format", e);
-    }
-  }, []);
 
   const addResume = async () => {
     const token = localStorage.getItem("token");
@@ -119,52 +96,48 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`;
   };
 
   return (
-    <div>
-      {" "}
-      {username ? <h2>Welcome, {username}!</h2> : <h2>Loading…</h2>}
-      <div className="min-h-screen bg-[#1e1e1e] text-white p-4 font-mono">
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-3xl">Your Resumes</h1>
-          <button
-            onClick={addResume}
-            className="bg-green-600 hover:bg-green-700 px-3 py-1 rounded text-sm"
-          >
-            Add Resume
-          </button>
-        </div>
-
-        {resumes.length === 0 ? (
-          <p className="text-gray-400">You haven’t created any resumes yet.</p>
-        ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {resumes.map((resume) => (
-              <div
-                key={resume._id}
-                onClick={() => navigate(`/editor/${resume._id}`)}
-                className="cursor-pointer bg-[#2d2d2d] p-4 rounded shadow hover:bg-[#3a3a3a] transition"
-              >
-                <div className="flex justify-between items-center mb-2">
-                  <span className="font-semibold">{resume.name}</span>
-                  <span className="text-xs text-gray-400">
-                    {new Date(resume.createdAt).toLocaleDateString()}
-                  </span>
-                </div>
-                <pre className="text-xs h-24 overflow-hidden text-gray-300">
-                  {resume.html.slice(0, 100)}...
-                </pre>
-                <div className="mt-2">
-                  <button
-                    onClick={(e) => deleteResume(e, resume._id)}
-                    className="bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-sm"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+    <div className="min-h-screen bg-[#1e1e1e] text-white p-4 font-mono">
+      <div className="flex items-center justify-between mb-4">
+        <h1 className="text-3xl">Your Resumes</h1>
+        <button
+          onClick={addResume}
+          className="bg-green-600 hover:bg-green-700 px-3 py-1 rounded text-sm"
+        >
+          Add Resume
+        </button>
       </div>
+
+      {resumes.length === 0 ? (
+        <p className="text-gray-400">You haven’t created any resumes yet.</p>
+      ) : (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {resumes.map((resume) => (
+            <div
+              key={resume._id}
+              onClick={() => navigate(`/editor/${resume._id}`)}
+              className="cursor-pointer bg-[#2d2d2d] p-4 rounded shadow hover:bg-[#3a3a3a] transition"
+            >
+              <div className="flex justify-between items-center mb-2">
+                <span className="font-semibold">{resume.name}</span>
+                <span className="text-xs text-gray-400">
+                  {new Date(resume.createdAt).toLocaleDateString()}
+                </span>
+              </div>
+              <pre className="text-xs h-24 overflow-hidden text-gray-300">
+                {resume.html.slice(0, 100)}...
+              </pre>
+              <div className="mt-2">
+                <button
+                  onClick={(e) => deleteResume(e, resume._id)}
+                  className="bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-sm"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

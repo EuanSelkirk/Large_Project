@@ -142,7 +142,7 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`);
         <div className="w-1/3 border-r border-[#3c3c3c]">
           <ResumeEditor code={cssCode} setCode={setCssCode} language="css" />
         </div>
-        <div className="w-1/3 bg-[#1e1e1e] flex justify-center items-center">
+        <div className="w-1/3 bg-[#1e1e1e] flex justify-center">
           <div className="w-[90%] aspect-[210/297] bg-[#1e1e1e] border shadow box-border">
             <LivePreview ref={previewRef} html={html} css={cssCode} />
           </div>
