@@ -1,16 +1,49 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 // Define the shape of your User object
+interface LoginResponse {
+  id?: string;
+  username?: string;
+  token?: string;
+  error?: string;
+}
 
 const Login = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
+  const navigate = useNavigate();
 
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
     setError("");
+
+    try {
+      const { data } = await axios.post<LoginResponse>("/api/auth/login", {
+        login: email,
+        password,
+      });
+
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("userId", data.id!);
+        localStorage.setItem("username", data.username!);
+        navigate("/dashboard");
+      } else {
+        setError(data.error || "Unable to login. Check your credentials.");
+      }
+    } catch (err: unknown) {
+      console.error(err);
+      let message: string | undefined;
+      if (err && typeof err === "object" && "response" in err) {
+        const e = err as { response?: { data?: { error?: string } } };
+        message = e.response?.data?.error;
+      }
+      setError(message || "Unable to login. Check your credentials.");
+    }
   };
 
   return (
@@ -26,7 +59,7 @@ const Login = () => {
               Username or Email
             </label>
             <input
-              type="email"
+              type="text"
               className="w-full px-3 py-2 rounded bg-[#1e1e1e] border border-gray-600 text-white"
               value={email}
               onChange={(e) => setEmail(e.target.value)}

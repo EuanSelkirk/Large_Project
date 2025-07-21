@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
@@ -38,11 +37,14 @@ const Register = () => {
       } else {
         setError(data.error || "Registration failed");
       }
-    } catch (err: any) {
-      console.error("Registration error response:", err.response?.data);
-      setError(
-        err.response?.data?.error || "Registration error. Please try again."
-      );
+    } catch (err: unknown) {
+      console.error("Registration error response:", err);
+      let message: string | undefined;
+      if (err && typeof err === "object" && "response" in err) {
+        const e = err as { response?: { data?: { error?: string } } };
+        message = e.response?.data?.error;
+      }
+      setError(message || "Registration error. Please try again.");
     }
   };
 
