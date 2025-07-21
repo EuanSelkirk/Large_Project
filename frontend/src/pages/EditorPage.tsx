@@ -1,13 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import ResumeEditor from "../components/ResumeEditor";
 import LivePreview from "../components/LivePreview";
+import html2pdf from "html2pdf.js";
 
 const EditorPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+
+  const previewRef = useRef<HTMLIFrameElement>(null);
 
   const [code, setCode] = useState(`function Resume() {
   return (
@@ -70,6 +73,16 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`);
     }
   };
 
+  const downloadPdf = async () => {
+    console.log(previewRef);
+    if (!previewRef.current) return;
+    const doc =
+      previewRef.current.contentDocument ||
+      previewRef.current.contentWindow?.document;
+    if (!doc) return;
+    await html2pdf().from(doc.body).save("resume.pdf");
+  };
+
   return (
     <div className="flex flex-col h-screen bg-[#1e1e1e] text-white font-mono">
       {/* Top bar with Tabs + Save/Dashboard */}
@@ -102,6 +115,13 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`);
             className="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-white text-xs"
           >
             Save
+          </button>
+
+          <button
+            onClick={downloadPdf}
+            className="bg-green-600 hover:bg-green-700 px-3 py-1 rounded text-white text-xs"
+          >
+            Download
           </button>
         </div>
       </div>
