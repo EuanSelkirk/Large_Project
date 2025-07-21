@@ -7,10 +7,11 @@ const router = express.Router();
 // Create a new resume
 router.post("/", authenticate, async (req, res) => {
   try {
-    const { name, code } = req.body;
+    const { name, html, css } = req.body;
     const resume = new Resume({
       name,
-      code,
+      html,
+      css,
       user: req.user.userId,
     });
     await resume.save();
@@ -48,9 +49,15 @@ router.get("/:id", authenticate, async (req, res) => {
 // Update a resume
 router.put("/:id", authenticate, async (req, res) => {
   try {
+    const { html, css, name } = req.body;
+    const update = {};
+    if (html !== undefined) update.html = html;
+    if (css !== undefined) update.css = css;
+    if (name !== undefined) update.name = name;
+
     const resume = await Resume.findOneAndUpdate(
       { _id: req.params.id, user: req.user.userId },
-      req.body,
+      update,
       { new: true }
     );
     if (!resume)

@@ -10,7 +10,11 @@ const resumeSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  code: {
+  html: {
+    type: String,
+    required: true,
+  },
+  css: {
     type: String,
     required: true,
   },

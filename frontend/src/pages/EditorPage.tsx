@@ -12,7 +12,7 @@ const EditorPage = () => {
 
   const previewRef = useRef<HTMLIFrameElement>(null);
 
-  const [code, setCode] = useState(`function Resume() {
+  const [html, setHtml] = useState(`function Resume() {
   return (
     <div className="resume">
       <h1>Jane Doe</h1>
@@ -32,7 +32,7 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`);
 }
 `);
 
-  const [activeTab, setActiveTab] = useState<"jsx" | "css" | "preview">("jsx");
+  const [activeTab, setActiveTab] = useState<"html" | "css" | "preview">("html");
 
   // load existing resume
   useEffect(() => {
@@ -41,11 +41,12 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`);
       const token = localStorage.getItem("token");
       if (!token) return navigate("/login");
       try {
-        const { data } = await axios.get<{ code: string }>(
+        const { data } = await axios.get<{ html: string; css: string }>(
           `/api/resumes/${id}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        setCode(data.code);
+        setHtml(data.html);
+        setCssCode(data.css);
       } catch (err: any) {
         if (err.response?.status === 404) navigate("/dashboard");
         console.error(err);
@@ -62,7 +63,7 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`);
     try {
       await axios.put(
         `/api/resumes/${id}`,
-        { code },
+        { html, css: cssCode },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       // you can replace alert with a fancier toast
@@ -89,7 +90,7 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`);
       <div className="flex justify-between items-center bg-[#2d2d2d] px-2 text-sm select-none">
         {/* Tabs */}
         <div className="flex space-x-1">
-          {(["jsx", "css", "preview"] as const).map((tab) => (
+          {(["html", "css", "preview"] as const).map((tab) => (
             <div
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -99,8 +100,8 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`);
                   : "bg-[#2d2d2d] border-transparent text-gray-400 hover:text-white"
               }`}
             >
-              {tab === "jsx"
-                ? "Resume.jsx"
+              {tab === "html"
+                ? "Resume.html"
                 : tab === "css"
                 ? "Resume.css"
                 : "Preview"}
@@ -128,28 +129,28 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`);
 
       {/* MOBILE: toggled view */}
       <div className="md:hidden flex-1 overflow-hidden relative">
-        <div className={activeTab === "jsx" ? "block h-full" : "hidden"}>
-          <ResumeEditor code={code} setCode={setCode} />
+        <div className={activeTab === "html" ? "block h-full" : "hidden"}>
+          <ResumeEditor code={html} setCode={setHtml} language="javascript" />
         </div>
         <div className={activeTab === "css" ? "block h-full" : "hidden"}>
-          <ResumeEditor code={cssCode} setCode={setCssCode} />
+          <ResumeEditor code={cssCode} setCode={setCssCode} language="css" />
         </div>
         <div className={activeTab === "preview" ? "block h-full" : "hidden"}>
-          <LivePreview ref={previewRef} code={code} css={cssCode} />
+          <LivePreview ref={previewRef} html={html} css={cssCode} />
         </div>
       </div>
 
       {/* DESKTOP: side-by-side */}
       <div className="hidden md:flex flex-1 border-t border-[#3c3c3c]">
         <div className="w-1/3 border-r border-[#3c3c3c]">
-          <ResumeEditor code={code} setCode={setCode} />
+          <ResumeEditor code={html} setCode={setHtml} language="javascript" />
         </div>
         <div className="w-1/3 border-r border-[#3c3c3c]">
-          <ResumeEditor code={cssCode} setCode={setCssCode} />
+          <ResumeEditor code={cssCode} setCode={setCssCode} language="css" />
         </div>
         <div className="w-1/3 bg-[#1e1e1e] flex justify-center items-center">
           <div className="w-[90%] aspect-[210/297] bg-white border shadow">
-            <LivePreview ref={previewRef} code={code} css={cssCode} />
+            <LivePreview ref={previewRef} html={html} css={cssCode} />
           </div>
         </div>
       </div>
