@@ -46,8 +46,9 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`);
         );
         setHtml(data.html);
         setCssCode(data.css);
-      } catch (err: any) {
-        if (err.response?.status === 404) navigate("/dashboard");
+      } catch (err) {
+        const error = err as { response?: { status?: number } };
+        if (error.response?.status === 404) navigate("/dashboard");
         console.error(err);
       }
     };
@@ -142,7 +143,7 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`);
           <ResumeEditor code={cssCode} setCode={setCssCode} language="css" />
         </div>
         <div className="w-1/3 bg-[#1e1e1e] flex justify-center items-center">
-          <div className="w-[90%] aspect-[210/297] bg-white border shadow">
+          <div className="w-[90%] aspect-[210/297] bg-[#1e1e1e] border shadow box-border">
             <LivePreview ref={previewRef} html={html} css={cssCode} />
           </div>
         </div>
