@@ -45,7 +45,6 @@ const LivePreview = React.forwardRef<HTMLIFrameElement, Props>(
         width: 210mm;
         min-height: 297mm;
         box-sizing: border-box;
-        padding: 20mm;
         background: white;
       }
       ${css}
