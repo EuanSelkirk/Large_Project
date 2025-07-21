@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+// src/pages/EditorPage.tsx
 import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -9,10 +9,10 @@ import html2pdf from "html2pdf.js";
 const EditorPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-
   const previewRef = useRef<HTMLIFrameElement>(null);
 
-  const [code, setCode] = useState(`function Resume() {
+  // "html" here holds your JSX/React code
+  const [html, setHtml] = useState(`function Resume() {
   return (
     <div className="resume">
       <h1>Jane Doe</h1>
@@ -32,20 +32,22 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`);
 }
 `);
 
+  // Tabs: JSX, CSS, Preview
   const [activeTab, setActiveTab] = useState<"jsx" | "css" | "preview">("jsx");
 
-  // load existing resume
+  // Load existing resume
   useEffect(() => {
     if (!id) return;
     const load = async () => {
       const token = localStorage.getItem("token");
       if (!token) return navigate("/login");
       try {
-        const { data } = await axios.get<{ code: string }>(
+        const { data } = await axios.get<{ html: string; css: string }>(
           `/api/resumes/${id}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        setCode(data.code);
+        setHtml(data.html);
+        setCssCode(data.css);
       } catch (err: any) {
         if (err.response?.status === 404) navigate("/dashboard");
         console.error(err);
@@ -54,7 +56,7 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`);
     load();
   }, [id, navigate]);
 
-  // save handler
+  // Save changes back to the server
   const saveResume = async () => {
     if (!id) return;
     const token = localStorage.getItem("token");
@@ -62,10 +64,9 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`);
     try {
       await axios.put(
         `/api/resumes/${id}`,
-        { code },
+        { html, css: cssCode },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      // you can replace alert with a fancier toast
       alert("Resume saved!");
     } catch (err) {
       console.error(err);
@@ -73,8 +74,8 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`);
     }
   };
 
+  // Download the preview as PDF
   const downloadPdf = async () => {
-    console.log(previewRef);
     if (!previewRef.current) return;
     const doc =
       previewRef.current.contentDocument ||
@@ -85,7 +86,7 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`);
 
   return (
     <div className="flex flex-col h-screen bg-[#1e1e1e] text-white font-mono">
-      {/* Top bar with Tabs + Save/Dashboard */}
+      {/* Top bar with Tabs + Save/Download */}
       <div className="flex justify-between items-center bg-[#2d2d2d] px-2 text-sm select-none">
         {/* Tabs */}
         <div className="flex space-x-1">
@@ -99,16 +100,12 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`);
                   : "bg-[#2d2d2d] border-transparent text-gray-400 hover:text-white"
               }`}
             >
-              {tab === "jsx"
-                ? "Resume.jsx"
-                : tab === "css"
-                ? "Resume.css"
-                : "Preview"}
+              {tab === "jsx" ? "JSX" : tab === "css" ? "CSS" : "Preview"}
             </div>
           ))}
         </div>
 
-        {/* Save + Dashboard */}
+        {/* Save + Download */}
         <div className="space-x-2">
           <button
             onClick={saveResume}
@@ -116,7 +113,6 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`);
           >
             Save
           </button>
-
           <button
             onClick={downloadPdf}
             className="bg-green-600 hover:bg-green-700 px-3 py-1 rounded text-white text-xs"
@@ -129,27 +125,27 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`);
       {/* MOBILE: toggled view */}
       <div className="md:hidden flex-1 overflow-hidden relative">
         <div className={activeTab === "jsx" ? "block h-full" : "hidden"}>
-          <ResumeEditor code={code} setCode={setCode} />
+          <ResumeEditor code={html} setCode={setHtml} language="javascript" />
         </div>
         <div className={activeTab === "css" ? "block h-full" : "hidden"}>
-          <ResumeEditor code={cssCode} setCode={setCssCode} />
+          <ResumeEditor code={cssCode} setCode={setCssCode} language="css" />
         </div>
         <div className={activeTab === "preview" ? "block h-full" : "hidden"}>
-          <LivePreview ref={previewRef} code={code} css={cssCode} />
+          <LivePreview ref={previewRef} html={html} css={cssCode} />
         </div>
       </div>
 
       {/* DESKTOP: side-by-side */}
       <div className="hidden md:flex flex-1 border-t border-[#3c3c3c]">
         <div className="w-1/3 border-r border-[#3c3c3c]">
-          <ResumeEditor code={code} setCode={setCode} />
+          <ResumeEditor code={html} setCode={setHtml} language="javascript" />
         </div>
         <div className="w-1/3 border-r border-[#3c3c3c]">
-          <ResumeEditor code={cssCode} setCode={setCssCode} />
+          <ResumeEditor code={cssCode} setCode={setCssCode} language="css" />
         </div>
         <div className="w-1/3 bg-[#1e1e1e] flex justify-center items-center">
           <div className="w-[90%] aspect-[210/297] bg-white border shadow">
-            <LivePreview ref={previewRef} code={code} css={cssCode} />
+            <LivePreview ref={previewRef} html={html} css={cssCode} />
           </div>
         </div>
       </div>

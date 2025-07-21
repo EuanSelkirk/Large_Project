@@ -5,7 +5,8 @@ import axios from "axios";
 interface Resume {
   _id: string;
   name: string;
-  code: string;
+  html: string;
+  css: string;
   createdAt: string;
 }
 
@@ -71,7 +72,7 @@ const Dashboard = () => {
     const name =
       window.prompt("Enter a name for this resume", "Untitled Resume") ||
       "Untitled Resume";
-    const defaultCode = `function Resume() {
+    const defaultHtml = `function Resume() {
   return (
     <div className="resume">
       <h1>Jane Doe</h1>
@@ -81,10 +82,18 @@ const Dashboard = () => {
 }
 
 ReactDOM.render(<Resume />, document.getElementById("root"));`;
+    const defaultCss = `.resume {
+  font-family: 'Georgia', serif;
+  padding: 2rem;
+}
+.resume h1 {
+  font-size: 2rem;
+}
+`;
     try {
       const { data } = await axios.post<Resume>(
         "/api/resumes",
-        { name, code: defaultCode },
+        { name, html: defaultHtml, css: defaultCss },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setResumes((prev) => [data, ...prev]);
@@ -141,7 +150,7 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`;
                   </span>
                 </div>
                 <pre className="text-xs h-24 overflow-hidden text-gray-300">
-                  {resume.code.slice(0, 100)}...
+                  {resume.html.slice(0, 100)}...
                 </pre>
                 <div className="mt-2">
                   <button

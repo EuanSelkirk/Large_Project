@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useImperativeHandle } from "react";
 
 type Props = {
-  code: string;
+  html: string; // React/JSX code string
   css?: string;
 };
 
 const LivePreview = React.forwardRef<HTMLIFrameElement, Props>(
-  ({ code, css = "" }, ref) => {
+  ({ html, css = "" }, ref) => {
     const iframeRef = useRef<HTMLIFrameElement>(null);
 
     useImperativeHandle(
@@ -18,7 +18,7 @@ const LivePreview = React.forwardRef<HTMLIFrameElement, Props>(
     );
 
     useEffect(() => {
-      const html = `
+      const fullHtml = `
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -51,19 +51,18 @@ const LivePreview = React.forwardRef<HTMLIFrameElement, Props>(
 
     <script type="text/babel">
       try {
-        ${code}
+        ${html}
       } catch (err) {
-        document.body.innerHTML =
-          '<pre style="color: red;">' + err + '</pre>';
+        document.body.innerHTML = '<pre style="color: red;">' + err + '</pre>';
       }
     </script>
   </body>
 </html>
 `;
       if (iframeRef.current) {
-        iframeRef.current.srcdoc = html;
+        iframeRef.current.srcdoc = fullHtml;
       }
-    }, [code, css]);
+    }, [html, css]);
 
     return (
       <iframe

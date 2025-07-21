@@ -10,11 +10,18 @@ const resumeSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  code: {
+  html: {
     type: String,
     required: true,
   },
-  createdAt: { type: Date, default: Date.now },
+  css: {
+    type: String,
+    required: true,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 const Resume = mongoose.model("Resume", resumeSchema);
