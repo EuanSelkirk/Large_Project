@@ -3,11 +3,18 @@ import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
+interface RegisterResponse {
+  token?: string;
+  id?: string;
+  username?: string;
+  error?: string;
+}
+
 const Register = () => {
-  const [username, setUsername] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [error, setError] = useState<string>("");
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleRegister = async (e: FormEvent) => {
@@ -15,25 +22,26 @@ const Register = () => {
     setError("");
 
     try {
-      const res = await axios.post("/api/register", {
-        username,
-        email,
-        password,
-      });
+      const { data } = await axios.post<RegisterResponse>(
+        "/api/auth/register",
+        { username, email, password }
+      );
 
       console.log("here");
 
-      if (res.data.token) {
-        localStorage.setItem("token", res.data.token);
-        localStorage.setItem("userId", res.data.id);
-        localStorage.setItem("username", res.data.username);
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("userId", data.id!);
+        localStorage.setItem("username", data.username!);
         navigate("/editor");
       } else {
-        setError(res.data.error || "Registration failed");
+        setError(data.error || "Registration failed");
       }
-    } catch (err) {
-      console.error(err);
-      setError("Registration error. Please try again.");
+    } catch (err: any) {
+      console.error("Registration error response:", err.response?.data);
+      setError(
+        err.response?.data?.error || "Registration error. Please try again."
+      );
     }
   };
 

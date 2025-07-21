@@ -27,26 +27,32 @@ mongoose
 
 // Main API router (previously index.js)
 const apiRouter = express.Router();
-apiRouter.use("/auth", loginRouter);
-apiRouter.use("/auth", registerRouter);
-apiRouter.use("/resumes", resumeRouter);
-apiRouter.use("/debug", debugRouter);
+const mountedRouters = [
+  { prefix: "/auth", router: loginRouter },
+  { prefix: "/auth", router: registerRouter },
+  { prefix: "/resumes", router: resumeRouter },
+  { prefix: "/debug", router: debugRouter },
+];
+mountedRouters.forEach(({ prefix, router }) => {
+  apiRouter.use(prefix, router);
+});
+
+const API_BASE = "/api";
 
 // Mount the API router
-app.use("/api", apiRouter);
+app.use(API_BASE, apiRouter);
 
 // Root health-check endpoint
 app.get("/", (req, res) => res.send("API running"));
 
 // Debug: Print all active endpoints
-const rootEndpoints = listEndpoints(app).map((e) => ({
-  path: e.path,
-  methods: e.methods.join(", "),
-}));
-const apiEndpoints = listEndpoints(apiRouter).map((e) => ({
-  path: "/api" + e.path,
-  methods: e.methods.join(", "),
-}));
+const rootEndpoints = [{ path: "/", methods: "GET" }];
+const apiEndpoints = mountedRouters.flatMap(({ prefix, router }) =>
+  listEndpoints(router).map((e) => ({
+    path: API_BASE + prefix + (e.path === "/" ? "" : e.path),
+    methods: e.methods.join(", "),
+  }))
+);
 console.table([...rootEndpoints, ...apiEndpoints], ["path", "methods"]);
 
 // Start server

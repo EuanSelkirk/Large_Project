@@ -21,15 +21,13 @@ const Login = () => {
     e.preventDefault();
     setError("");
 
-    console.log("here");
-
     try {
       // 3) DEBUG: fetch all users with correct typing
-      const { data: users } = await axios.get<User[]>("/api/users");
-      console.log("🛠️ [DEBUG] All users:", users);
+      const { data: users } = await axios.get<User[]>("/api/debug/users");
+      console.log("here");
 
       // 4) Continue on
-      navigate("/editor");
+      // navigate("/editor");
     } catch (err: any) {
       console.error(err);
       setError(
