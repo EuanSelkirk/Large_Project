@@ -130,11 +130,11 @@ const Register = () => {
           <button
             type="submit"
             disabled={!isPasswordValid || !username || !email}
-            className={`w-full py-2 rounded text-white ${
+            className={w-full py-2 rounded text-white ${
               isPasswordValid && username && email
                 ? "bg-green-600 hover:bg-green-700"
                 : "bg-gray-600 cursor-not-allowed"
-            }`}
+            }}
           >
             Register
           </button>
