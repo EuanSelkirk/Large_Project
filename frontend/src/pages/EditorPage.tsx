@@ -5,13 +5,13 @@ import axios from "axios";
 import ResumeEditor from "../components/ResumeEditor";
 import LivePreview from "../components/LivePreview";
 import html2pdf from "html2pdf.js";
+import { Save, Download } from "lucide-react";
 
 const EditorPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const previewRef = useRef<HTMLIFrameElement>(null);
 
-  // "html" here holds your JSX/React code
   const [html, setHtml] = useState(`function Resume() {
   return (
     <div className="resume">
@@ -32,10 +32,8 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`);
 }
 `);
 
-  // Tabs: JSX, CSS, Preview
   const [activeTab, setActiveTab] = useState<"jsx" | "css" | "preview">("jsx");
 
-  // Load existing resume
   useEffect(() => {
     if (!id) return;
     const load = async () => {
@@ -56,7 +54,6 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`);
     load();
   }, [id, navigate]);
 
-  // Save changes back to the server
   const saveResume = async () => {
     if (!id) return;
     const token = localStorage.getItem("token");
@@ -74,7 +71,6 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`);
     }
   };
 
-  // Download the preview as PDF
   const downloadPdf = async () => {
     if (!previewRef.current) return;
     const doc =
@@ -86,7 +82,7 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`);
 
   return (
     <div className="flex flex-col h-screen bg-[#1e1e1e] text-white font-mono">
-      {/* Top bar with Tabs + Save/Download */}
+      {/* Top bar with Tabs + Save/Download icons */}
       <div className="flex justify-between items-center bg-[#2d2d2d] px-2 text-sm select-none">
         {/* Tabs */}
         <div className="flex space-x-1">
@@ -105,19 +101,21 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`);
           ))}
         </div>
 
-        {/* Save + Download */}
-        <div className="space-x-2">
+        {/* Save + Download Icons */}
+        <div className="flex space-x-2">
           <button
             onClick={saveResume}
-            className="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-white text-xs"
+            aria-label="Save"
+            className="p-2 bg-blue-600 hover:bg-blue-700 rounded"
           >
-            Save
+            <Save className="h-5 w-5 text-white" />
           </button>
           <button
             onClick={downloadPdf}
-            className="bg-green-600 hover:bg-green-700 px-3 py-1 rounded text-white text-xs"
+            aria-label="Download"
+            className="p-2 bg-green-600 hover:bg-green-700 rounded"
           >
-            Download
+            <Download className="h-5 w-5 text-white" />
           </button>
         </div>
       </div>
