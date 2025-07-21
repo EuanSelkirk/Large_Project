@@ -1,3 +1,4 @@
+// routes/auth.js
 import jwt from "jsonwebtoken";
 import express from "express";
 import bcrypt from "bcrypt";
@@ -5,17 +6,11 @@ import nodemailer from "nodemailer";
 import crypto from "crypto";
 import User from "../model/users.js";
 
-const passwordRegex =
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$!%*?&])[A-Za-z\d@#$!%*?&]{8,}$/;
-
 const router = express.Router();
 
+// LOGIN
 router.post("/login", async (req, res) => {
   const { login, password } = req.body;
-  let error = "";
-  let id = "";
-  let username = "";
-  let token = "";
 
   try {
     const user = await User.findOne({
@@ -29,59 +24,51 @@ router.post("/login", async (req, res) => {
         token: "",
         error: "Invalid username or password",
       });
-    } else {
-      if (!user.verified) {
-        return res.status(403).json({
-          id: "",
-          username: "",
-          token: "",
-          error: "Please verify your email before logging in",
-        });
-      }
-
-      const isMatch = await bcrypt.compare(password, user.password);
-
-      if (isMatch) {
-      const token = jwt.sign(
-        { userId: user._id, username: user.username },
-        process.env.JWT_SECRET,
-        { expiresIn: "1h" }
-      );
-
-      return res.status(200).json({
-        id: user._id,
-        username: user.username,
-        token: token,
-        error: "",
-      });
-
-      } else {
-        return res.status(401).json({
-          id: "",
-          username: "",
-          token: "",
-          error: "Invalid username or password",
-        });
-      }
     }
+
+    if (!user.verified) {
+      return res.status(403).json({
+        id: "",
+        username: "",
+        token: "",
+        error: "Please verify your email before logging in",
+      });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({
+        id: "",
+        username: "",
+        token: "",
+        error: "Invalid username or password",
+      });
+    }
+
+    const token = jwt.sign(
+      { userId: user._id, username: user.username },
+      process.env.JWT_SECRET,
+      { expiresIn: "10h" }
+    );
+
+    return res.status(200).json({
+      id: user._id,
+      username: user.username,
+      token,
+      error: "",
+    });
   } catch (err) {
     console.error("Login error:", err);
-    error = "Server error during login process.";
-    return res
-      .status(500)
-      .json({ id: "", username: "", token: "", error: error });
+    return res.status(500).json({
+      id: "",
+      username: "",
+      token: "",
+      error: "Server error during login process.",
+    });
   }
-
-  const ret = {
-    id,
-    username,
-    token,
-    error,
-  };
-
-  res.status(200).json(ret);
 });
 
+// FORGOT PASSWORD
 router.post("/forgot-password", async (req, res) => {
   const { email } = req.body;
   try {
@@ -103,10 +90,9 @@ router.post("/forgot-password", async (req, res) => {
       await transporter.sendMail({
         to: user.email,
         subject: "Password Reset",
-        text: `Reset your password by visiting: http://localhost:3000/api/login/reset-password/${resetToken}`,
+        text: `Reset your password by visiting: http://localhost:3000/api/auth/reset-password/${resetToken}`,
       });
     }
-
     res.json({
       message: "If that account exists, a reset link has been sent.",
     });
@@ -116,6 +102,7 @@ router.post("/forgot-password", async (req, res) => {
   }
 });
 
+// RESET PASSWORD (no complexity check here)
 router.post("/reset-password/:token", async (req, res) => {
   const { token } = req.params;
   const { password } = req.body;
@@ -130,13 +117,7 @@ router.post("/reset-password/:token", async (req, res) => {
       return res.status(400).json({ error: "Invalid or expired token" });
     }
 
-    if (!passwordRegex.test(password)) {
-      return res.status(400).json({
-        error:
-          "Password must be at least 8 characters and include uppercase, lowercase, number and special character.",
-      });
-    }
-
+    // Simply hash & save, without regex checks
     const hashed = await bcrypt.hash(password, 10);
     user.password = hashed;
     user.resetPasswordToken = undefined;

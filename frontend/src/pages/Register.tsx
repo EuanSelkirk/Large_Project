@@ -10,6 +10,10 @@ interface RegisterResponse {
   error?: string;
 }
 
+// includes ! @ # $ % ^ & * ( )
+const passwordRegex =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()])[A-Za-z\d!@#$%^&*()]{8,}$/;
+
 const Register = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -17,17 +21,30 @@ const Register = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
+  // live‐check flags
+  const isLengthValid = password.length >= 8;
+  const hasLowercase = /[a-z]/.test(password);
+  const hasUppercase = /[A-Z]/.test(password);
+  const hasDigit = /\d/.test(password);
+  const hasSpecial = /[!@#$%^&*()]/.test(password);
+  const isPasswordValid = passwordRegex.test(password);
+
   const handleRegister = async (e: FormEvent) => {
     e.preventDefault();
     setError("");
+
+    if (!isPasswordValid) {
+      setError(
+        "Password must be at least 8 characters and include uppercase, lowercase, number, and one special character from !@#$%^&*()."
+      );
+      return;
+    }
 
     try {
       const { data } = await axios.post<RegisterResponse>(
         "/api/auth/register",
         { username, email, password }
       );
-
-      console.log("here");
 
       if (data.token) {
         localStorage.setItem("token", data.token);
@@ -87,13 +104,37 @@ const Register = () => {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
+
+            {/* live feedback */}
+            <ul className="mt-2 text-sm space-y-1">
+              <li className={isLengthValid ? "text-green-400" : "text-red-500"}>
+                {isLengthValid ? "✓" : "✗"} At least 8 characters
+              </li>
+              <li className={hasLowercase ? "text-green-400" : "text-red-500"}>
+                {hasLowercase ? "✓" : "✗"} One lowercase letter
+              </li>
+              <li className={hasUppercase ? "text-green-400" : "text-red-500"}>
+                {hasUppercase ? "✓" : "✗"} One uppercase letter
+              </li>
+              <li className={hasDigit ? "text-green-400" : "text-red-500"}>
+                {hasDigit ? "✓" : "✗"} One number
+              </li>
+              <li className={hasSpecial ? "text-green-400" : "text-red-500"}>
+                {hasSpecial ? "✓" : "✗"} One special character (!@#$%^&*())
+              </li>
+            </ul>
           </div>
 
           {error && <p className="text-red-500 text-sm">{error}</p>}
 
           <button
             type="submit"
-            className="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded"
+            disabled={!isPasswordValid || !username || !email}
+            className={`w-full py-2 rounded text-white ${
+              isPasswordValid && username && email
+                ? "bg-green-600 hover:bg-green-700"
+                : "bg-gray-600 cursor-not-allowed"
+            }`}
           >
             Register
           </button>
