@@ -64,26 +64,24 @@ const Register = () => {
         localStorage.setItem("token", data.token);
         localStorage.setItem("userId", data.id!);
         localStorage.setItem("username", data.username!);
-        navigate("/editor");
+        navigate("/login");
       } else {
         setError(data.error || "Registration failed");
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Registration error:", err);
-      const msg = err.response?.data?.error;
-      setError(msg || "Registration error. Please try again.");
     }
   };
 
   const canSubmit = !!username && !!email && isPasswordValid;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 to-indigo-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[#1e1e1e] text-white flex items-center justify-center p-4 font-mono">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-8 w-full max-w-md"
+        className="bg-[#2d2d2d] rounded-lg shadow-lg p-8 w-full max-w-md"
       >
         <h2 className="text-3xl font-extrabold text-white text-center mb-6">
           Register
