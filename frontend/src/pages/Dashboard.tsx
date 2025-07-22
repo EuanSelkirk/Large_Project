@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../api/axios";
 
 interface Resume {
   _id: string;
@@ -23,7 +23,7 @@ const Dashboard = () => {
       }
 
       try {
-        const res = await axios.get<Resume[]>("/api/resumes", {
+        const res = await api.get<Resume[]>("/api/resumes", {
           headers: { Authorization: `Bearer ${token}` },
         });
         // sort newest first
@@ -68,7 +68,7 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`;
 }
 `;
     try {
-      const { data } = await axios.post<Resume>(
+      const { data } = await api.post<Resume>(
         "/api/resumes",
         { name, html: defaultHtml, css: defaultCss },
         { headers: { Authorization: `Bearer ${token}` } }
@@ -86,7 +86,7 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`;
     const token = localStorage.getItem("token");
     if (!token) return navigate("/login");
     try {
-      await axios.delete(`/api/resumes/${id}`, {
+      await api.delete(`/api/resumes/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setResumes((prev) => prev.filter((r) => r._id !== id));

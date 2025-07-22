@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import type { FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { useNavigate, Link } from "react-router-dom";
+import api from "../api/axios";
 
 interface RegisterResponse {
   token?: string;
@@ -21,13 +21,24 @@ const Register = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  // live‐check flags
-  const isLengthValid = password.length >= 8;
-  const hasLowercase = /[a-z]/.test(password);
-  const hasUppercase = /[A-Z]/.test(password);
-  const hasDigit = /\d/.test(password);
-  const hasSpecial = /[!@#$%^&*()]/.test(password);
-  const isPasswordValid = passwordRegex.test(password);
+  // compute all checks once per render
+  const {
+    isLengthValid,
+    hasLowercase,
+    hasUppercase,
+    hasDigit,
+    hasSpecial,
+    isPasswordValid,
+  } = useMemo(() => {
+    return {
+      isLengthValid: password.length >= 8,
+      hasLowercase: /[a-z]/.test(password),
+      hasUppercase: /[A-Z]/.test(password),
+      hasDigit: /\d/.test(password),
+      hasSpecial: /[!@#$%^&*()]/.test(password),
+      isPasswordValid: passwordRegex.test(password),
+    };
+  }, [password]);
 
   const handleRegister = async (e: FormEvent) => {
     e.preventDefault();
@@ -35,16 +46,17 @@ const Register = () => {
 
     if (!isPasswordValid) {
       setError(
-        "Password must be at least 8 characters and include uppercase, lowercase, number, and one special character from !@#$%^&*()."
+        "Password must be ≥8 chars, include uppercase, lowercase, number, and one of !@#$%^&*()."
       );
       return;
     }
 
     try {
-      const { data } = await axios.post<RegisterResponse>(
-        "/api/auth/register",
-        { username, email, password }
-      );
+      const { data } = await api.post<RegisterResponse>("/api/auth/register", {
+        username,
+        email,
+        password,
+      });
 
       if (data.token) {
         localStorage.setItem("token", data.token);
@@ -54,16 +66,14 @@ const Register = () => {
       } else {
         setError(data.error || "Registration failed");
       }
-    } catch (err: unknown) {
-      console.error("Registration error response:", err);
-      let message: string | undefined;
-      if (err && typeof err === "object" && "response" in err) {
-        const e = err as { response?: { data?: { error?: string } } };
-        message = e.response?.data?.error;
-      }
-      setError(message || "Registration error. Please try again.");
+    } catch (err: any) {
+      console.error("Registration error:", err);
+      const msg = err.response?.data?.error;
+      setError(msg || "Registration error. Please try again.");
     }
   };
+
+  const canSubmit = !!username && !!email && isPasswordValid;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#1e1e1e]">
@@ -120,7 +130,7 @@ const Register = () => {
                 {hasDigit ? "✓" : "✗"} One number
               </li>
               <li className={hasSpecial ? "text-green-400" : "text-red-500"}>
-                {hasSpecial ? "✓" : "✗"} One special character (!@#$%^&*())
+                {hasSpecial ? "✓" : "✗"} One special char {"!@#$%^&*()"}
               </li>
             </ul>
           </div>
@@ -129,12 +139,12 @@ const Register = () => {
 
           <button
             type="submit"
-            disabled={!isPasswordValid || !username || !email}
-            className={w-full py-2 rounded text-white ${
-              isPasswordValid && username && email
+            disabled={!canSubmit}
+            className={`w-full py-2 rounded text-white transition ${
+              canSubmit
                 ? "bg-green-600 hover:bg-green-700"
                 : "bg-gray-600 cursor-not-allowed"
-            }}
+            }`}
           >
             Register
           </button>
@@ -142,9 +152,9 @@ const Register = () => {
 
         <p className="text-gray-400 text-sm mt-4 text-center">
           Already have an account?{" "}
-          <a href="/login" className="text-blue-400 hover:underline">
+          <Link className="text-blue-400 hover:underline" to="/login">
             Login
-          </a>
+          </Link>
         </p>
       </div>
     </div>

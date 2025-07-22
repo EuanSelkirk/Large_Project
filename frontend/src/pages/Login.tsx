@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../api/axios";
 
 // Define the shape of your User object
 interface LoginResponse {
@@ -22,7 +22,7 @@ const Login = () => {
     setError("");
 
     try {
-      const { data } = await axios.post<LoginResponse>("/api/auth/login", {
+      const { data } = await api.post<LoginResponse>("/api/auth/login", {
         login: email,
         password,
       });

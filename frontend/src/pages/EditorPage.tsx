@@ -1,7 +1,7 @@
 // src/pages/EditorPage.tsx
 import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../api/axios";
 import ResumeEditor from "../components/ResumeEditor";
 import LivePreview from "../components/LivePreview";
 import html2pdf from "html2pdf.js";
@@ -45,14 +45,21 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`
       const token = localStorage.getItem("token");
       if (!token) return navigate("/login");
       try {
-        const { data } = await axios.get<{ html: string; css: string }>(
+        const { data } = await api.get<{ html: string; css: string }>(
           `/api/resumes/${id}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setHtml(data.html);
         setCssCode(data.css);
-      } catch (err: any) {
-        if (err.response?.status === 404) navigate("/dashboard");
+      } catch (err: unknown) {
+        if (
+          err &&
+          typeof err === "object" &&
+          "response" in err &&
+          (err as { response?: { status?: number } }).response?.status === 404
+        ) {
+          navigate("/dashboard");
+        }
         console.error(err);
       }
     })();
@@ -63,7 +70,7 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`
     const token = localStorage.getItem("token");
     if (!token) return navigate("/login");
     try {
-      await axios.put(
+      await api.put(
         `/api/resumes/${id}`,
         { html, css: cssCode },
         { headers: { Authorization: `Bearer ${token}` } }
