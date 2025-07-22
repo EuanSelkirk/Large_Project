@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Plus, Trash } from "lucide-react";
 import api from "../api/axios";
 
 interface Resume {
@@ -101,21 +102,22 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`;
         <h1 className="text-3xl">Your Resumes</h1>
         <button
           onClick={addResume}
-          className="bg-green-600 hover:bg-green-700 px-3 py-1 rounded text-sm"
+          aria-label="Add Resume"
+          className="p-2 rounded bg-indigo-500 hover:bg-indigo-600"
         >
-          Add Resume
+          <Plus className="w-5 h-5 text-white" />
         </button>
       </div>
 
       {resumes.length === 0 ? (
         <p className="text-gray-400">You haven’t created any resumes yet.</p>
       ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {resumes.map((resume) => (
             <div
               key={resume._id}
               onClick={() => navigate(`/editor/${resume._id}`)}
-              className="cursor-pointer bg-[#2d2d2d] p-4 rounded shadow hover:bg-[#3a3a3a] transition"
+              className="cursor-pointer bg-[#2d2d2d] p-4 rounded-md border border-[#3c3c3c] hover:bg-[#3a3a3a] transition"
             >
               <div className="flex justify-between items-center mb-2">
                 <span className="font-semibold">{resume.name}</span>
@@ -126,12 +128,13 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`;
               <pre className="text-xs h-24 overflow-hidden text-gray-300">
                 {resume.html.slice(0, 100)}...
               </pre>
-              <div className="mt-2">
+              <div className="mt-2 text-right">
                 <button
                   onClick={(e) => deleteResume(e, resume._id)}
-                  className="bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-sm"
+                  aria-label="Delete Resume"
+                  className="p-2 rounded bg-red-600 hover:bg-red-700"
                 >
-                  Delete
+                  <Trash className="w-4 h-4 text-white" />
                 </button>
               </div>
             </div>
