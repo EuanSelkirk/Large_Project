@@ -1,5 +1,6 @@
 // src/pages/EditorPage.tsx
 import { useEffect, useState, useRef } from "react";
+import type * as Monaco from "monaco-editor";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import ResumeEditor from "../components/ResumeEditor";
@@ -11,6 +12,8 @@ const EditorPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const previewRef = useRef<HTMLIFrameElement>(null);
+  const jsxEditorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null);
+  const cssEditorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null);
 
   const [html, setHtml] = useState(
     `function Resume() {
@@ -37,6 +40,14 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`
   const [activeTab, setActiveTab] = useState<"jsx" | "css" | "preview">("jsx");
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [downloadSuccess, setDownloadSuccess] = useState(false);
+
+  useEffect(() => {
+    if (activeTab === "jsx") {
+      jsxEditorRef.current?.layout();
+    } else if (activeTab === "css") {
+      cssEditorRef.current?.layout();
+    }
+  }, [activeTab]);
 
   // load existing resume
   useEffect(() => {
@@ -148,10 +159,20 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`
       {/* MOBILE: toggled view */}
       <div className="md:hidden flex-1 overflow-hidden relative">
         <div className={activeTab === "jsx" ? "block h-full" : "hidden"}>
-          <ResumeEditor code={html} setCode={setHtml} language="javascript" />
+          <ResumeEditor
+            code={html}
+            setCode={setHtml}
+            language="javascript"
+            editorRef={jsxEditorRef}
+          />
         </div>
         <div className={activeTab === "css" ? "block h-full" : "hidden"}>
-          <ResumeEditor code={cssCode} setCode={setCssCode} language="css" />
+          <ResumeEditor
+            code={cssCode}
+            setCode={setCssCode}
+            language="css"
+            editorRef={cssEditorRef}
+          />
         </div>
         <div className={activeTab === "preview" ? "block h-full" : "hidden"}>
           <LivePreview ref={previewRef} html={html} css={cssCode} />
@@ -161,10 +182,20 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`
       {/* DESKTOP: side-by-side */}
       <div className="hidden md:flex flex-1 border-t border-[#3c3c3c]">
         <div className="w-1/3 border-r border-[#3c3c3c]">
-          <ResumeEditor code={html} setCode={setHtml} language="javascript" />
+          <ResumeEditor
+            code={html}
+            setCode={setHtml}
+            language="javascript"
+            editorRef={jsxEditorRef}
+          />
         </div>
         <div className="w-1/3 border-r border-[#3c3c3c]">
-          <ResumeEditor code={cssCode} setCode={setCssCode} language="css" />
+          <ResumeEditor
+            code={cssCode}
+            setCode={setCssCode}
+            language="css"
+            editorRef={cssEditorRef}
+          />
         </div>
         <div className="w-1/3 bg-[#1e1e1e] flex justify-center">
           <div className="w-[90%] aspect-[210/297] bg-[#1e1e1e] border shadow box-border">
