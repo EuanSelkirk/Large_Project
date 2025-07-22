@@ -136,19 +136,19 @@ const Register = () => {
           {/* Live Feedback */}
           <div className="bg-white/10 rounded-lg p-3 mt-2">
             <ul className="text-sm space-y-1 pl-1">
-              <li className={isLengthValid ? "text-green-300" : "text-red-400"}>
+              <li className={isLengthValid ? "text-green-300" : "text-red-600"}>
                 {isLengthValid ? "✓" : "✗"} At least 8 characters
               </li>
-              <li className={hasLowercase ? "text-green-300" : "text-red-400"}>
+              <li className={hasLowercase ? "text-green-300" : "text-red-600"}>
                 {hasLowercase ? "✓" : "✗"} One lowercase letter
               </li>
-              <li className={hasUppercase ? "text-green-300" : "text-red-400"}>
+              <li className={hasUppercase ? "text-green-300" : "text-red-600"}>
                 {hasUppercase ? "✓" : "✗"} One uppercase letter
               </li>
-              <li className={hasDigit ? "text-green-300" : "text-red-400"}>
+              <li className={hasDigit ? "text-green-300" : "text-red-600"}>
                 {hasDigit ? "✓" : "✗"} One number
               </li>
-              <li className={hasSpecial ? "text-green-300" : "text-red-400"}>
+              <li className={hasSpecial ? "text-green-300" : "text-red-600"}>
                 {hasSpecial ? "✓" : "✗"} One special char {"!@#$%^&*()"}
               </li>
             </ul>
