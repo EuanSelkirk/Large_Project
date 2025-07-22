@@ -46,55 +46,66 @@ const Login = () => {
     }
   };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-[#1e1e1e]">
-      <div className="bg-[#2d2d2d] p-8 rounded shadow-lg w-full max-w-md">
-        <h2 className="text-2xl font-bold text-white mb-6 text-center">
+ return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-900 to-indigo-900 flex items-center justify-center p-4">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-8 w-full max-w-md"
+      >
+        <h2 className="text-3xl font-extrabold text-white text-center mb-6">
           Login
         </h2>
 
-        <form onSubmit={handleLogin} className="space-y-4">
-          <div>
-            <label className="block text-gray-300 mb-1">
-              Username or Email
-            </label>
+        <form onSubmit={handleLogin} className="space-y-5">
+          <div className="relative">
+            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300" />
             <input
               type="text"
-              className="w-full px-3 py-2 rounded bg-[#1e1e1e] border border-gray-600 text-white"
+              placeholder="Username or Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              className="w-full pl-10 pr-4 py-2 rounded-lg bg-white/20 placeholder-gray-300 text-white focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
             />
           </div>
 
-          <div>
-            <label className="block text-gray-300 mb-1">Password</label>
+          <div className="relative">
+            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300" />
             <input
               type="password"
-              className="w-full px-3 py-2 rounded bg-[#1e1e1e] border border-gray-600 text-white"
+              placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              className="w-full pl-10 pr-4 py-2 rounded-lg bg-white/20 placeholder-gray-300 text-white focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
             />
           </div>
 
-          {error && <p className="text-red-500 text-sm">{error}</p>}
+          {error && (
+            <p className="text-red-400 text-center font-medium">{error}</p>
+          )}
 
           <button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded"
+            disabled={!email || !password}
+            className="w-full py-2 rounded-full text-white font-semibold bg-indigo-500 hover:bg-indigo-600 transition disabled:opacity-50"
           >
             Login
           </button>
         </form>
 
-        <p className="text-gray-400 text-sm mt-4 text-center">
+        <p className="text-gray-300 text-center mt-6">
           Don’t have an account?{" "}
-          <a href="/register" className="text-blue-400 hover:underline">
+          <a
+            href="/register"
+            className="font-medium text-indigo-200 hover:text-white transition"
+          >
             Register
           </a>
         </p>
-      </div>
+      </motion.div>
     </div>
   );
 };
