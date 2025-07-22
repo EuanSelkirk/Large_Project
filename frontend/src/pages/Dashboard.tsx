@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, Trash } from "lucide-react";
+import { Plus, Trash, Pencil } from "lucide-react";
 import api from "../api/axios";
 
 interface Resume {
@@ -13,6 +13,8 @@ interface Resume {
 
 const Dashboard = () => {
   const [resumes, setResumes] = useState<Resume[]>([]);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingName, setEditingName] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -47,9 +49,7 @@ const Dashboard = () => {
       navigate("/login");
       return;
     }
-    const name =
-      window.prompt("Enter a name for this resume", "Untitled Resume") ||
-      "Untitled Resume";
+    const name = "Untitled Resume";
     const defaultHtml = `function Resume() {
   return (
     <div className="resume">
@@ -75,13 +75,38 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`;
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setResumes((prev) => [data, ...prev]);
-      navigate(`/editor/${data._id}`);
     } catch (err) {
       console.error(err);
     }
   };
 
-  const deleteResume = async (e: React.MouseEvent, id: string) => {
+  const startEditing = (e: MouseEvent, resume: Resume) => {
+    e.stopPropagation();
+    setEditingId(resume._id);
+    setEditingName(resume.name);
+  };
+
+  const saveName = async () => {
+    if (!editingId) return;
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+    try {
+      const { data } = await api.put<Resume>(
+        `/api/resumes/${editingId}`,
+        { name: editingName },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setResumes((prev) => prev.map((r) => (r._id === data._id ? data : r)));
+    } catch (err) {
+      console.error(err);
+    }
+    setEditingId(null);
+  };
+
+  const deleteResume = async (e: MouseEvent, id: string) => {
     e.stopPropagation(); // ← prevent the card’s onClick
     if (!window.confirm("Delete this resume?")) return;
     const token = localStorage.getItem("token");
@@ -120,7 +145,36 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`;
               className="cursor-pointer bg-[#2d2d2d] p-4 rounded-md border border-[#3c3c3c] hover:bg-[#3a3a3a] transition"
             >
               <div className="flex justify-between items-center mb-2">
-                <span className="font-semibold">{resume.name}</span>
+                <div className="flex items-center space-x-1">
+                  {editingId === resume._id ? (
+                    <input
+                      value={editingName}
+                      onChange={(e) => setEditingName(e.target.value)}
+                      onClick={(e) => e.stopPropagation()}
+                      onBlur={saveName}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          (e.target as HTMLInputElement).blur();
+                        } else if (e.key === "Escape") {
+                          setEditingId(null);
+                        }
+                      }}
+                      className="bg-[#2d2d2d] border border-[#3c3c3c] rounded px-1 text-sm"
+                      autoFocus
+                    />
+                  ) : (
+                    <>
+                      <span className="font-semibold">{resume.name}</span>
+                      <button
+                        onClick={(e) => startEditing(e, resume)}
+                        aria-label="Edit Name"
+                        className="p-1 rounded hover:bg-[#3a3a3a]"
+                      >
+                        <Pencil className="w-3 h-3 text-gray-400 hover:text-white" />
+                      </button>
+                    </>
+                  )}
+                </div>
                 <span className="text-xs text-gray-400">
                   {new Date(resume.createdAt).toLocaleDateString()}
                 </span>
@@ -132,7 +186,7 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`;
                 <button
                   onClick={(e) => deleteResume(e, resume._id)}
                   aria-label="Delete Resume"
-                  className="p-2 rounded bg-red-600 hover:bg-red-700"
+                  className="p-2 rounded bg-red-500 hover:bg-red-600"
                 >
                   <Trash className="w-4 h-4 text-white" />
                 </button>
