@@ -89,7 +89,7 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`
       previewRef.current.contentWindow?.document;
     if (!doc) return;
     try {
-      await html2pdf().from(doc.body).save("resume.pdf");
+      await html2pdf().from(doc.documentElement).save("resume.pdf");
       setDownloadSuccess(true);
       setTimeout(() => setDownloadSuccess(false), 1500);
     } catch (err) {
