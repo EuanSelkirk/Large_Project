@@ -14,41 +14,38 @@ const LivePreview = React.forwardRef<HTMLIFrameElement, Props>(
 
     useImperativeHandle(ref, () => iframeRef.current!);
 
-    // on mount + resize, recompute the scale so the sheet fits its wrapper
     useEffect(() => {
       const updateScale = () => {
         if (!wrapperRef.current || !sheetRef.current) return;
         const wrap = wrapperRef.current.getBoundingClientRect();
-        const sheet = sheetRef.current.getBoundingClientRect();
-        const factor = Math.min(
-          wrap.width / sheet.width,
-          wrap.height / sheet.height,
-          1
-        );
-        setScale(factor);
+        const sheetWidth = sheetRef.current.scrollWidth;
+        const factor = Math.min(wrap.width / sheetWidth, 1);
+        setScale(Number(factor.toFixed(3)));
       };
 
       updateScale();
       window.addEventListener("resize", updateScale);
       const ro = new ResizeObserver(updateScale);
       if (wrapperRef.current) ro.observe(wrapperRef.current);
+
       return () => {
         window.removeEventListener("resize", updateScale);
         ro.disconnect();
       };
     }, []);
 
-    // rebuild the iframe contents when html/css change
     useEffect(() => {
       const fullHtml = `
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
+      html, body { margin: 0; padding: 0; }
       @page { size: A4 portrait; margin: 0; }
       .resume-sheet {
         width: 210mm;
-        min-height: 297mm;
         box-sizing: border-box;
         background: white;
       }
@@ -69,9 +66,7 @@ const LivePreview = React.forwardRef<HTMLIFrameElement, Props>(
     </script>
   </body>
 </html>`;
-      if (iframeRef.current) {
-        iframeRef.current.srcdoc = fullHtml;
-      }
+      if (iframeRef.current) iframeRef.current.srcdoc = fullHtml;
     }, [html, css]);
 
     return (
@@ -80,7 +75,8 @@ const LivePreview = React.forwardRef<HTMLIFrameElement, Props>(
         style={{
           width: "100%",
           height: "100%",
-          overflow: "hidden",
+          overflowX: "hidden",
+          overflowY: "auto",
           boxSizing: "border-box",
           background: "#1e1e1e",
         }}
@@ -89,7 +85,6 @@ const LivePreview = React.forwardRef<HTMLIFrameElement, Props>(
           ref={sheetRef}
           style={{
             width: "210mm",
-            height: "297mm",
             transform: `scale(${scale})`,
             transformOrigin: "top left",
           }}
@@ -100,8 +95,8 @@ const LivePreview = React.forwardRef<HTMLIFrameElement, Props>(
             sandbox="allow-scripts allow-same-origin"
             style={{
               width: "210mm",
-              height: "297mm",
-              border: "1px solid #ccc",
+              height: "auto",
+              minHeight: "297mm",
             }}
           />
         </div>

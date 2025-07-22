@@ -198,7 +198,7 @@ ReactDOM.render(<Resume />, document.getElementById("root"));`
           />
         </div>
         <div className="w-1/3 bg-[#1e1e1e] flex justify-center">
-          <div className="w-[90%] aspect-[210/297] bg-[#1e1e1e] border shadow box-border">
+          <div className="w-[90%] aspect-[210/297] bg-[#1e1e1e]">
             <LivePreview ref={previewRef} html={html} css={cssCode} />
           </div>
         </div>
