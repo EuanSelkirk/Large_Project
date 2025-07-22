@@ -2,9 +2,11 @@
 import jwt from "jsonwebtoken";
 import express from "express";
 import bcrypt from "bcrypt";
-import nodemailer from "nodemailer";
+import sgMail from "@sendgrid/mail";
 import crypto from "crypto";
 import User from "../model/users.js";
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const router = express.Router();
 
@@ -79,20 +81,31 @@ router.post("/forgot-password", async (req, res) => {
       user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
       await user.save();
 
-      const transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_PASS,
-        },
-      });
+      const resetLink = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
 
-      await transporter.sendMail({
+      const msg = {
         to: user.email,
-        subject: "Password Reset",
-        text: `Reset your password by visiting: http://localhost:3000/api/auth/reset-password/${resetToken}`,
-      });
+        from: {
+          name: "ResumeBuilder",
+          email: process.env.SENDER_EMAIL,
+        },
+        subject: "Your Password Reset Request",
+        html: `
+          <div style="font-family: sans-serif; text-align: center; padding: 20px;">
+            <h2>Password Reset Request</h2>
+            <p>You are receiving this email because a password reset was requested for your account.</p>
+            <a href="${resetLink}" style="background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 10px;">
+              Reset Your Password
+            </a>
+            <p style="margin-top: 20px;">This link will expire in one hour.</p>
+            <p style="font-size: 12px;">If you did not request a password reset, please disregard this email.</p>
+          </div>
+        `,
+      };
+
+      await sgMail.send(msg);
     }
+    
     res.json({
       message: "If that account exists, a reset link has been sent.",
     });
