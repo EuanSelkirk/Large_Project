@@ -2,9 +2,11 @@
 import express from "express";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import nodemailer from "nodemailer";
+import sgMail from "@sendgrid/mail";
 import crypto from "crypto";
 import User from "../model/users.js";
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const passwordRegex =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()])[A-Za-z\d!@#$%^&*()]{8,}$/;
@@ -73,18 +75,17 @@ router.post("/register", async (req, res) => {
     const backend = process.env.BACKEND_URL || "http://localhost:5174";
     const verifyLink = `${backend}/api/auth/verify/${verificationToken}`;
 
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-    });
-    await transporter.sendMail({
+
+    const msg = {
       to: user.email,
+      from: process.env.SENDER_EMAIL, // This must be a verified sender in your SendGrid account
       subject: "Verify your email",
       text: `Click to verify your email: ${verifyLink}`,
-    });
+      // You can also use html for a richer email format:
+      // html: `<p>Click to verify your email: <a href="${verifyLink}">${verifyLink}</a></p>`,
+    };
+
+    await sgMail.send(msg);
 
     // 8) Issue JWT
     const token = jwt.sign(
