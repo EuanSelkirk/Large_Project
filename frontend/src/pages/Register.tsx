@@ -1,6 +1,8 @@
 import { useState, useMemo } from "react";
 import type { FormEvent } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { Mail, Lock, User } from "lucide-react";
 import api from "../api/axios";
 
 interface RegisterResponse {
@@ -75,7 +77,6 @@ const Register = () => {
 
   const canSubmit = !!username && !!email && isPasswordValid;
 
- 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-900 to-indigo-900 flex items-center justify-center p-4">
       <motion.div
@@ -90,45 +91,47 @@ const Register = () => {
 
         <form onSubmit={handleRegister} className="space-y-5">
           {/* Username */}
-          <div className="relative">
-            <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300" />
+          <div className="flex items-center gap-3 bg-white/20 rounded-lg px-3 py-2">
+            <User className="text-gray-300" />
             <input
               type="text"
               placeholder="Username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
-              className="w-full pl-10 pr-4 py-2 rounded-lg bg-white/20 placeholder-gray-300 text-white focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
+              className="flex-1 bg-transparent placeholder-gray-300 text-white focus:outline-none"
             />
           </div>
 
           {/* Email */}
-          <div className="relative">
-            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300" />
+          <div className="flex items-center gap-3 bg-white/20 rounded-lg px-3 py-2">
+            <Mail className="text-gray-300" />
             <input
               type="email"
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full pl-10 pr-4 py-2 rounded-lg bg-white/20 placeholder-gray-300 text-white focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
+              className="flex-1 bg-transparent placeholder-gray-300 text-white focus:outline-none"
             />
           </div>
 
-          {/* Password */}
-          <div className="relative">
-            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300" />
+          {/* Password Input */}
+          <div className="bg-white/20 rounded-lg px-3 py-2 flex items-center gap-3">
+            <Lock className="text-gray-300" />
             <input
               type="password"
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full pl-10 pr-4 py-2 rounded-lg bg-white/20 placeholder-gray-300 text-white focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
+              className="flex-1 bg-transparent placeholder-gray-300 text-white focus:outline-none"
             />
+          </div>
 
-            {/* live feedback */}
-            <ul className="mt-2 text-sm space-y-1 pl-2">
+          {/* Live Feedback */}
+          <div className="bg-white/10 rounded-lg p-3 mt-2">
+            <ul className="text-sm space-y-1 pl-1">
               <li className={isLengthValid ? "text-green-300" : "text-red-400"}>
                 {isLengthValid ? "✓" : "✗"} At least 8 characters
               </li>

@@ -1,6 +1,9 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { Mail, Lock } from "lucide-react";
+
 import api from "../api/axios";
 
 // Define the shape of your User object
@@ -46,7 +49,7 @@ const Login = () => {
     }
   };
 
- return (
+  return (
     <div className="min-h-screen bg-gradient-to-br from-blue-900 to-indigo-900 flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
