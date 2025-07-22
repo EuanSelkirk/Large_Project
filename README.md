@@ -1,4 +1,4 @@
-# Large Project
+# Resume Builder
 
 This project is a full-stack web application using:
 
@@ -25,6 +25,13 @@ This project is a full-stack web application using:
 └── /server        → Express + MongoDB API
 ```
 
+## 🌐 Website Layout
+
+- **Home Page** – introduction with links to log in or register.
+- **Dashboard** – lists your saved resumes with options to add or delete.
+- **Editor** – VSCode-inspired editor with live preview and PDF export.
+- **Profile** – shows your username and provides a logout button.
+
 ---
 
 ## 🚀 Setup Instructions
@@ -38,7 +45,30 @@ cd Large_Project
 
 ---
 
-### 2. Backend Setup (`/server`) TODO
+### 2. Backend Setup (`/server`)
+
+```bash
+cd server
+npm install
+```
+
+#### 🛠 Create `.env` file
+
+```env
+MONGO_URI=mongodb://localhost:27017/largeprojectserver
+PORT=5174
+EMAIL_USER=<your_email>
+EMAIL_PASS=<your_app_password>
+JWT_SECRET=<your_secret>
+```
+
+#### ▶️ Start Backend
+
+```bash
+node server.js
+```
+
+Backend will run at: [http://localhost:5174](http://localhost:5174)
 
 ---
 
