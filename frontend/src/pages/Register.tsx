@@ -69,7 +69,13 @@ const Register = () => {
         setError(data.error || "Registration failed");
       }
     } catch (err: unknown) {
-      console.error("Registration error:", err);
+      console.error(err);
+      let message: string | undefined;
+      if (err && typeof err === "object" && "response" in err) {
+        const e = err as { response?: { data?: { error?: string } } };
+        message = e.response?.data?.error;
+      }
+      setError(message || "Unable to Register. Check your credentials.");
     }
   };
 
