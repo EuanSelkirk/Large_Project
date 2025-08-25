@@ -1,0 +1,21 @@
+:root {
+  --bg: #0f1115;
+  --panel: #151821;
+  --text: #e6e6e6;
+  --muted: #9aa3b2;
+  --border: #242938;
+  --accent: #7aa2f7;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+  --success: #22c55e;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg: #f9fafb;
+    --panel: #ffffff;
+    --text: #0f1115;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+  }
+}
